@@ -1,16 +1,23 @@
 ---
 title: "Read Data"
-author: ""
+author: ''
 date: "11/23/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-
 ```{r}
 library(foreign)
+library(tidyverse)
+library(e1071)
 sesame <- read.dta("sesame.dta")
+sesame <- sesame %>%
+  mutate(bodyDiff = postbody - prebody,
+         letDiff = postlet - prelet,
+         formDiff = postform - preform,
+         numbDiff = postnumb - prenumb,
+         relatDiff = postrelat - prerelat,
+         clasfDiff = postclasf - preclasf)
 ```
+
+
