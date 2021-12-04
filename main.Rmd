@@ -12,6 +12,7 @@ library(tidyverse)
 library(e1071)
 sesame <- read.dta("sesame.dta")
 sesame <- sesame %>%
+  mutate(site=factor(site)) %>%
   mutate(bodyDiff = postbody - prebody,
          letDiff = postlet - prelet,
          formDiff = postform - preform,
@@ -19,5 +20,50 @@ sesame <- sesame %>%
          relatDiff = postrelat - prerelat,
          clasfDiff = postclasf - preclasf)
 ```
+## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
+
+```{r test-train-split}
+set.seed(3241)
+
+n <- nrow(sesame)
+train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
+train.data <- sesame[train.index,]
+test.data <- sesame[-train.index,]
+```
+
+
+```{r svm-fitting}
+# Response: site (categorical)
+set.seed(315)
+costs <- c(0.001, 0.01, 0.1, 1, 5, 10, 100)
+gammas <- c(0.1, 0.5, 1, 2, 3, 4)
+
+linear.tune <- tune(svm, site~sex+age+prebody+prelet+preform+prenumb+prerelat+preclasf, 
+                    data=train.data, kernel="linear",
+                    ranges=list(cost=costs))
+radial.tune <- tune(svm, site~sex+age+prebody+prelet+preform+prenumb+prerelat+preclasf, 
+                    data=train.data, kernel="radial",
+                    ranges=list(cost=costs, 
+                                gamma=gammas))
+```
+
+```{r}
+linear.conMatrix <- table(true=test.data[, "site"],
+                          pred=predict(linear.tune$best.model, newdata=test.data))
+
+radial.conMatrix <- table(true=test.data[, "site"],
+                          pred=predict(radial.tune$best.model, newdata=test.data))
+
+linear.conMatrix
+radial.conMatrix
+```
+Radial kernel improves prediction on class 1. 
+
+### Questions for OH:
+## Both linear and radial kernels never output predictions for 4 & 5?
+## polynomial kernel? Which variables to give polynomial terms
+## use PCA to perform feature selection?
+## feature selections for SVM in general?
+
 
 
