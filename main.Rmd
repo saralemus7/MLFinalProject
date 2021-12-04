@@ -10,6 +10,11 @@ output:
 library(foreign)
 library(tidyverse)
 library(e1071)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(patchwork)
 sesame <- read.dta("sesame.dta")
 sesame <- sesame %>%
   mutate(site=factor(site)) %>%
@@ -20,6 +25,133 @@ sesame <- sesame %>%
          relatDiff = postrelat - prerelat,
          clasfDiff = postclasf - preclasf)
 ```
+
+## Exploratory Data Analysis
+
+```{r viewdata}
+head(sesame)
+```
+
+### Variables:
+
+The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The viewcat column is the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The setting is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The viewenc column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). Encour is the same variable but with values 0 and 1, respectively. Regular is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). 
+
+The prebody, prelet, preform, prenumb, prerelat, and preclasf columns all decribe pretest scores on varying types of assessments (body parts, letters, forms, numbers, relational terms, and classification skills, respectively). The columns labelled postbody, postlet, postform, postnumb, postrelat, and postclasf are the children's respective posttest scores. Above, we created the following variables - bodydiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff - to represent the difference in posttest scores and pretest scores for each child. Lastly, peabody represents a score of "mental age" for vocabulary maturity from the Peabody Picture Vocabulary Test.
+
+Our main focus will be on the new variables we created (bodyDiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff) and variables related to how often the children watch Sesame Street (namely, viewcat and regular). Lastly, we will look into the backgrounds of the children, including site, sex, and age.
+
+
+### Distributions:
+
+For the purposes of our analysis, we will first look at the distributions of bodyDiff, letDiff, formDiff, numbDiff, relatDiff, and clasfDiff.
+
+```{r visualizetestscoresdiff, message=FALSE}
+
+#want to visualize distributions of bodyDiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff
+
+bodyDiffplot <- ggplot(sesame, aes(x = bodyDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of bodyDiff", x = "Post - Pre on Body Parts", y = "Count") +
+  theme_minimal()
+
+letDiffplot <- ggplot(sesame, aes(x = letDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of letDiff", x = "Post - Pre on Letters", y = "Count") +
+  theme_minimal()
+
+formDiffplot <- ggplot(sesame, aes(x = formDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of formDiff", x = "Post - Pre on Forms", y = "Count") +
+  theme_minimal()
+
+numbDiffplot <- ggplot(sesame, aes(x = numbDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of numbDiff", x = "Post - Pre on Numbers", y = "Count") +
+  theme_minimal()
+
+relatDiffplot <- ggplot(sesame, aes(x = relatDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of relatDiff", x = "Post - Pre Relational Terms", y = "Count") +
+  theme_minimal()
+
+clasfDiffplot <- ggplot(sesame, aes(x = clasfDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of clasfDiff", x = "Post - Pre on Classif. Skills", y = "Count") +
+  theme_minimal()
+
+
+bodyDiffplot + letDiffplot + formDiffplot + numbDiffplot + relatDiffplot + clasfDiffplot
+
+```
+
+The six variables above were calculated by subtracting pre-test scores from post-test scores, so they are all numerical. The distributions of these six variables (bodyDiff, letDiff, formDiff, numbDiff, relatDiff, and clasfDiff) all appear to be roughly normal and unimodal. BodyDiff, letDiff, formDiff, relatDiff, and classDiff do not appear to have any obvious extreme outliers. Numbdiff, however, seems to be slightly left-skewed with outliers to the left -20. All of the six variables appear to have centers between 2 and 4. 
+
+
+
+We will now examine the distrubtions of the variables related to how often children watch Sesame Street (namely, viewcat and regular).
+
+```{r visualizingwatchingbehavior, message=FALSE}
+
+# want to visualize distributions of viewcat and regular
+
+viewcatplot <- ggplot(sesame, aes(x = factor(viewcat))) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Distribution of Viewcat", x = "Frequency of viewing Sesame Street", y = "Count") +
+  scale_x_discrete("Frequency of Viewing Sesame Street", labels=c("rarely", "1-2 pw", "3-5 pw", ">5 pw")) +
+  theme_minimal() +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
+
+
+regularplot <- ggplot(sesame, aes(x = factor(regular))) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Distribution of Regular", y = "Count") +
+  scale_x_discrete(labels=c("rarely watched", "watched >= 1 per week")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank()) +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
+
+viewcatplot + regularplot
+
+```
+
+Both of these variables are categorical. On the left, viewcat appears to have a roughly uniform distribution, with "rarely" having the least amount of children and 3-5 times per week having the most (the range is only 10 children, so all of the bars are relatively close in height). For the variable regular, the category "watched once per week or greater" has far more observations than "rarely watched." The former category has more than triple the amount of the latter. We will be aware of this disparity in our analysis and continue with caution towards potential bias.
+
+
+Lastly, we want to examine the distributions of site, sex, and age, all variables that relate to a child's background.
+
+```{r visualizingbackground, message=FALSE}
+
+# want to visualize distributions of site, sex, and age
+
+siteplot <- ggplot(sesame, aes(x = factor(site))) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Distribution of Site", y = "Count") +
+  scale_x_discrete(labels=c("3-5, disadv., inner city", "4, adv., suburb", "adv., rural", "disadv., rural", "disadv., Spanish")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank()) +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
+
+sexplot <- ggplot(sesame, aes(x = factor(sex))) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Distribution of Sex", y = "Count") +
+  scale_x_discrete(labels=c("Male", "Female")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank()) +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
+
+ageplot <- ggplot(sesame, aes(x = age)) +
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of Age", x = "Age in Months", y = "Count") +
+  theme_minimal()
+
+siteplot / (sexplot + ageplot)
+
+```
+
+Distribution of Site and Sex are both categorical variables. Distribution of Site has four categories with roughly the same amount of children (ranging from 43 to 64), but one category with far fewer observations (disadvantaged Spanish-speaking). This cateogry has less than half of the observations as the next smallest category, which is a relatively large disparity. We will continue our analysis with caution towards this bias in the data. The distribution of sex is very even - the male category has 115 observations, while the female category has 125 observations. 
+Age is a numerical variable that appears to be normal and bimodal, with two peaks around 50 and 56. There do not appear to be any extreme outliers in the distribution of age.
+
+
 ## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
 
 ```{r test-train-split}
@@ -60,10 +192,11 @@ radial.conMatrix
 Radial kernel improves prediction on class 1. 
 
 ### Questions for OH:
+## anything else needed in EDA?
 ## Both linear and radial kernels never output predictions for 4 & 5?
 ## polynomial kernel? Which variables to give polynomial terms
 ## use PCA to perform feature selection?
-## feature selections for SVM in general?
+## feature selections for SVM in general? 
 
 
 
