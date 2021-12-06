@@ -23,7 +23,17 @@ sesame <- sesame %>%
          formDiff = postform - preform,
          numbDiff = postnumb - prenumb,
          relatDiff = postrelat - prerelat,
-         clasfDiff = postclasf - preclasf)
+         clasfDiff = postclasf - preclasf) %>%
+  mutate(sd_pBod = scale(prebody, center = TRUE, scale = TRUE),
+         sd_plet = scale(prelet, center = TRUE, scale = TRUE),
+         sd_pform = scale(preform, center = TRUE, scale = TRUE),
+         sd_pnumb = scale(prenumb, center = TRUE, scale = TRUE),
+         sd_prelat = scale(prerelat, center = TRUE, scale = TRUE),
+         sd_pclasf = scale(preclasf, center = TRUE, scale = TRUE),
+         sd_peabody = scale(peabody, center = TRUE, scale = TRUE), 
+         sd_age = scale(age, center =TRUE, scale = TRUE),
+         male=if_else(sex==1, 1, 0),
+         female=if_else(sex==2, 1, 0))
 ```
 
 ## Exploratory Data Analysis
@@ -161,6 +171,9 @@ n <- nrow(sesame)
 train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
 train.data <- sesame[train.index,]
 test.data <- sesame[-train.index,]
+
+train.data %>%
+  count(site)
 ```
 
 
@@ -170,13 +183,18 @@ set.seed(315)
 costs <- c(0.001, 0.01, 0.1, 1, 5, 10, 100)
 gammas <- c(0.1, 0.5, 1, 2, 3, 4)
 
-linear.tune <- tune(svm, site~sex+age+prebody+prelet+preform+prenumb+prerelat+preclasf, 
+linear.tune <- tune(svm, site~female+ male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
                     data=train.data, kernel="linear",
                     ranges=list(cost=costs))
-radial.tune <- tune(svm, site~sex+age+prebody+prelet+preform+prenumb+prerelat+preclasf, 
+
+radial.tune <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
                     data=train.data, kernel="radial",
                     ranges=list(cost=costs, 
                                 gamma=gammas))
+#radial.tune <- tune(svm, site~sex+age+prebody+prelet+preform+prenumb+prerelat+preclasf, 
+#                    data=train.data, kernel="radial",
+#                    ranges=list(cost=costs, 
+#                                gamma=gammas))
 ```
 
 ```{r}
@@ -190,6 +208,14 @@ linear.conMatrix
 radial.conMatrix
 ```
 Radial kernel improves prediction on class 1. 
+
+```{r}
+std.data <- sesame
+```
+
+RBF slightly improved after standardizing? (it seems slightly more likely to predict
+on class 1. ) thought, simpler models still retain the same performance (arguably better)
+sd_age+sd_pBod+sd_plet. But we are still not getting any predicition on class 4 & 5. 
 
 ### Questions for OH:
 ## anything else needed in EDA?
