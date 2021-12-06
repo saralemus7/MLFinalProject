@@ -10,6 +10,9 @@ output:
 library(foreign)
 library(tidyverse)
 library(e1071)
+library(tree)
+library(randomForest)
+library(caret)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
@@ -23,7 +26,8 @@ sesame <- sesame %>%
          formDiff = postform - preform,
          numbDiff = postnumb - prenumb,
          relatDiff = postrelat - prerelat,
-         clasfDiff = postclasf - preclasf) %>%
+         clasfDiff = postclasf - preclasf)
+sesame.sd <- sesame%>%
   mutate(sd_pBod = scale(prebody, center = TRUE, scale = TRUE),
          sd_plet = scale(prelet, center = TRUE, scale = TRUE),
          sd_pform = scale(preform, center = TRUE, scale = TRUE),
@@ -164,13 +168,14 @@ Age is a numerical variable that appears to be normal and bimodal, with two peak
 
 ## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
 
+### SVM
 ```{r test-train-split}
 set.seed(3241)
 
 n <- nrow(sesame)
 train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
-train.data <- sesame[train.index,]
-test.data <- sesame[-train.index,]
+train.data <- sesame.sd[train.index,]
+test.data <- sesame.sd[-train.index,]
 
 train.data %>%
   count(site)
@@ -204,18 +209,53 @@ linear.conMatrix <- table(true=test.data[, "site"],
 radial.conMatrix <- table(true=test.data[, "site"],
                           pred=predict(radial.tune$best.model, newdata=test.data))
 
-linear.conMatrix
-radial.conMatrix
+confusionMatrix(linear.conMatrix)
+confusionMatrix(radial.conMatrix)
 ```
 Radial kernel improves prediction on class 1. 
 
-```{r}
-std.data <- sesame
-```
-
 RBF slightly improved after standardizing? (it seems slightly more likely to predict
 on class 1. ) thought, simpler models still retain the same performance (arguably better)
-sd_age+sd_pBod+sd_plet. But we are still not getting any predicition on class 4 & 5. 
+sd_age+sd_pBod+sd_plet. But we are still not getting any prediction on class 4 & 5. 
+
+### Tree
+```{r selecting-features-trees}
+set.seed(3215)
+#tree.data <- sesame %>%
+#  select(site, sex, age, viewcat, setting, viewenc, prebody, prelet, preform, 
+#         prenumb, prerelat, preclasf)
+
+n <- nrow(sesame)
+train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
+#train.tree <- tree.data[train.index,]
+#test.tree <- tree.data[-train.index,]
+
+tree.features <- c("site", "age", "viewcat", "setting", "viewenc", "prebody", "prelet",
+                   "preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet",
+                   "postform", "postnumb", "postrelat", "postclasf", "peabody")
+
+tree.data <- sesame[, tree.features]
+train.data <- tree.data[train.index,]
+test.data <- tree.data[-train.index,]
+```
+
+
+```{r fitting-randomForest}
+rf.tree<- randomForest(site~., data=tree.data, subset=train.index,
+                       mtry=4, importance=TRUE)
+
+importance(rf.tree)
+
+
+rf.pred <- predict(rf.tree, newdata=test.data)
+
+tree.conMatrix <- table(true=test.data[,"site"],
+                         pred=rf.pred)
+confusionMatrix(tree.conMatrix)
+```
+0.42 -- 0.4861. (Add more features, not including the standardized variables)
+
+
 
 ### Questions for OH:
 ## anything else needed in EDA?
@@ -224,5 +264,8 @@ sd_age+sd_pBod+sd_plet. But we are still not getting any predicition on class 4 
 ## use PCA to perform feature selection?
 ## feature selections for SVM in general? 
 
+## how to interpret the confusion matrix tables for SVM & Trees
+## How to interpret the imporatnce variance for multiclass classification
+## How to write for SVM interpretations
 
 
