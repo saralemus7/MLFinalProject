@@ -221,13 +221,14 @@ y <- sesame$bodyDiff
 set.seed(1)
 
 # cross validation for lambda
-cv.out <- cv.glmnet(x, y, alpha = 1) # setting alpha = 1 indicates lasso regression
+# I couldn't run cv.glmnet, so I commented it out, make sure to uncomment these calls.
+# cv.out <- cv.glmnet(x, y, alpha = 1) # setting alpha = 1 indicates lasso regression
 
 # optimal lambda value
-best.lam <- cv.out$lambda.min
+#best.lam <- cv.out$lambda.min
 
 # lasso regression model with optimal lambda
-las.mod <- glmnet(x, y, alpha = 1, lambda = best.lam)
+#las.mod <- glmnet(x, y, alpha = 1, lambda = best.lam)
 
 ```
 
@@ -388,6 +389,28 @@ Should I look for interactions?
 Is LASSO necessary here?
 
 ## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
+
+```{r checking-correlation-between-preTestVar}
+# "viewcat", "setting", "viewenc",
+pca.features <- c("age", "prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "peabody")
+
+pca.data <- sesame[, pca.features]
+
+round(cor(pca.data),2)
+```
+
+```{r}
+ggplot(data=sesame, aes(x=prenumb, y=prelet, color=site))+
+  geom_point()
+ggplot(data=sesame, aes(x=prenumb, y=prerelat, color=site))+
+  geom_point()
+ggplot(data=sesame, aes(x=preform, y=preclasf, color=site))+
+  geom_point()
+ggplot(data=sesame, aes(x=preclasf, y=prerelat, color=site))+
+  geom_point()
+```
+
+
 
 ### SVM
 ```{r test-train-split}
