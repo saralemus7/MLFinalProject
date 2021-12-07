@@ -166,6 +166,226 @@ siteplot / (sexplot + ageplot)
 Distribution of Site and Sex are both categorical variables. Distribution of Site has four categories with roughly the same amount of children (ranging from 43 to 64), but one category with far fewer observations (disadvantaged Spanish-speaking). This cateogry has less than half of the observations as the next smallest category, which is a relatively large disparity. We will continue our analysis with caution towards this bias in the data. The distribution of sex is very even - the male category has 115 observations, while the female category has 125 observations. 
 Age is a numerical variable that appears to be normal and bimodal, with two peaks around 50 and 56. There do not appear to be any extreme outliers in the distribution of age.
 
+## Q.1 Prediction Question: Can we use linear regression to predict the change in a child's test scores that occur after watching Sesame street (or in some instances, not watching Seasame street)?
+
+Here, I am fitting 7 linear regression models. The first 6 models predict a different difference in test score while the last model predicts the total difference in test scores. 
+
+```{r factor-categoricals}
+
+sesame$site <- as.factor(sesame$site)
+sesame$sex <- as.factor(sesame$sex)
+sesame$viewcat <- as.factor(sesame$viewcat)
+sesame$setting <- as.factor(sesame$setting)
+sesame$viewenc <- as.factor(sesame$viewenc)
+
+```
+
+```{r create-new-variable}
+
+sesame <- sesame %>%
+  mutate(totDiff = bodyDiff + letDiff + formDiff + numbDiff + relatDiff + clasfDiff)
+
+```
+
+```{r}
+
+lin.mod1 <- lm(bodyDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
+summary(lin.mod1)
+
+# training MSE
+mean(summary(lin.mod1)$residuals^2)
+
+# cross validation metrics
+m1.ctrl <- trainControl(method = "cv", number = 5)
+m1.cv <- train(bodyDiff ~ site + sex + age + viewcat + setting + viewenc,   
+                     data = sesame,                        
+                     trControl = m1.ctrl,              
+                     method = "lm",                      
+                     na.action = na.pass)
+m1.cv
+
+AIC(lin.mod1)
+
+lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+AIC(lin.mod1.full)
+
+```
+
+```{r LASSO}
+
+# Split data between x and y
+x <- model.matrix(bodyDiff ~ site + sex + age + viewcat + setting + viewenc,sesame)[,-1]
+y <- sesame$bodyDiff
+
+# set seed
+set.seed(1)
+
+# cross validation for lambda
+cv.out <- cv.glmnet(x, y, alpha = 1) # setting alpha = 1 indicates lasso regression
+
+# optimal lambda value
+best.lam <- cv.out$lambda.min
+
+# lasso regression model with optimal lambda
+las.mod <- glmnet(x, y, alpha = 1, lambda = best.lam)
+
+```
+
+```{r}
+
+lin.mod2 <- lm(letDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
+summary(lin.mod2)
+
+# training MSE
+mean(summary(lin.mod2)$residuals^2)
+
+# cross validation metrics
+m2.ctrl <- trainControl(method = "cv", number = 5)
+m2.cv <- train(letDiff ~ site + sex + age + viewcat + setting + viewenc,   
+                     data = sesame,                        
+                     trControl = m2.ctrl,              
+                     method = "lm",                      
+                     na.action = na.pass)
+m2.cv
+
+AIC(lin.mod2)
+
+lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+AIC(lin.mod2.full)
+
+```
+
+```{r}
+
+lin.mod3 <- lm(formDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
+summary(lin.mod3)
+
+# training MSE
+mean(summary(lin.mod3)$residuals^2)
+
+# cross validation metrics
+m3.ctrl <- trainControl(method = "cv", number = 5)
+m3.cv <- train(formDiff ~ site + sex + age + viewcat + setting + viewenc,   
+                     data = sesame,                        
+                     trControl = m3.ctrl,              
+                     method = "lm",                      
+                     na.action = na.pass)
+m3.cv
+
+AIC(lin.mod3)
+
+lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+AIC(lin.mod3.full)
+
+```
+
+```{r}
+
+lin.mod4 <- lm(numbDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
+summary(lin.mod4)
+
+# training MSE
+mean(summary(lin.mod4)$residuals^2)
+
+# cross validation metrics
+m4.ctrl <- trainControl(method = "cv", number = 5)
+m4.cv <- train(numbDiff ~ site + sex + age + viewcat + setting + viewenc,   
+                     data = sesame,                        
+                     trControl = m4.ctrl,              
+                     method = "lm",                      
+                     na.action = na.pass)
+m4.cv
+
+AIC(lin.mod4)
+
+lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+AIC(lin.mod4.full)
+
+```
+
+```{r}
+
+lin.mod5 <- lm(relatDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
+summary(lin.mod5)
+
+# training MSE
+mean(summary(lin.mod5)$residuals^2)
+
+# cross validation metrics
+m5.ctrl <- trainControl(method = "cv", number = 5)
+m5.cv <- train(relatDiff ~ site + sex + age + viewcat + setting + viewenc,   
+                     data = sesame,                        
+                     trControl = m5.ctrl,              
+                     method = "lm",                      
+                     na.action = na.pass)
+m5.cv
+
+AIC(lin.mod5)
+
+lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+AIC(lin.mod5.full)
+
+```
+
+```{r}
+
+lin.mod6 <- lm(clasfDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
+summary(lin.mod6)
+
+# training MSE
+mean(summary(lin.mod6)$residuals^2)
+
+# cross validation metrics
+m6.ctrl <- trainControl(method = "cv", number = 5)
+m6.cv <- train(clasfDiff ~ site + sex + age + viewcat + setting + viewenc,   
+                     data = sesame,                        
+                     trControl = m6.ctrl,              
+                     method = "lm",                      
+                     na.action = na.pass)
+m6.cv
+
+AIC(lin.mod6)
+
+lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+AIC(lin.mod6.full)
+
+```
+
+```{r}
+
+lin.mod7 <- lm(totDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
+summary(lin.mod7)
+
+# training MSE
+mean(summary(lin.mod7)$residuals^2)
+
+# cross validation metrics
+m7.ctrl <- trainControl(method = "cv", number = 5)
+m7.cv <- train(totDiff ~ site + sex + age + viewcat + setting + viewenc,   
+                     data = sesame,                        
+                     trControl = m7.ctrl,              
+                     method = "lm",                      
+                     na.action = na.pass)
+m7.cv
+
+AIC(lin.mod7)
+
+lin.mod7.full <- lm(totDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+AIC(lin.mod7.full)
+
+```
+
+
+```{r}
+
+# df1 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff", "totDiff"), Training-MSE = c(23.201, 80.703, 13.172), CV-MSE = c(25.361, 87.703, 14.938))
+# table <- kable(df1, caption = "MSE", booktabs=T)
+# kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+
+```
+
+Should I look for interactions?
+Is LASSO necessary here?
 
 ## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
 
