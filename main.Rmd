@@ -11,6 +11,7 @@ library(foreign)
 library(tidyverse)
 library(e1071)
 library(tree)
+library(gbm)
 library(randomForest)
 library(caret)
 library(ggplot2)
@@ -218,6 +219,19 @@ RBF slightly improved after standardizing? (it seems slightly more likely to pre
 on class 1. ) thought, simpler models still retain the same performance (arguably better)
 sd_age+sd_pBod+sd_plet. But we are still not getting any prediction on class 4 & 5. 
 
+
+```{r}
+# trying to do more EDA to see if anything explains why the data is not linearly separable
+boxplot(prebody~site, data=sesame)
+boxplot(prelet~site, data=sesame)
+boxplot(preform~site, data=sesame)
+boxplot(prenumb~site, data=sesame)
+boxplot(prerelat~site, data=sesame)
+boxplot(preclasf~site, data=sesame)
+boxplot(peabody~site, data=sesame)
+```
+
+
 ### Tree
 ```{r selecting-features-trees}
 set.seed(3215)
@@ -229,10 +243,13 @@ n <- nrow(sesame)
 train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
 #train.tree <- tree.data[train.index,]
 #test.tree <- tree.data[-train.index,]
+# "viewcat", "setting", "viewenc",
 
-tree.features <- c("site", "age", "viewcat", "setting", "viewenc", "prebody", "prelet",
-                   "preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet",
-                   "postform", "postnumb", "postrelat", "postclasf", "peabody")
+# ,"prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", #"postnumb", "postrelat", "postclasf", "peabody"
+                   
+                   
+
+tree.features <- c("site", "age", "viewcat", "setting", "viewenc")
 
 tree.data <- sesame[, tree.features]
 train.data <- tree.data[train.index,]
@@ -246,14 +263,38 @@ rf.tree<- randomForest(site~., data=tree.data, subset=train.index,
 
 importance(rf.tree)
 
-
 rf.pred <- predict(rf.tree, newdata=test.data)
 
 tree.conMatrix <- table(true=test.data[,"site"],
                          pred=rf.pred)
 confusionMatrix(tree.conMatrix)
 ```
-0.42 -- 0.4861. (Add more features, not including the standardized variables)
+0.42 -- 0.5139 (but not including the test scores.)
+around 0.45-0.48, when including the pretest scores.
+
+
+```{r fitting-boosting}
+set.seed(231)
+
+# ,"prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", #"postnumb", "postrelat", "postclasf", "peabody"
+                   
+                   
+
+features <- c("site", "age", "viewcat", "setting", "viewenc","prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", "postnumb", "postrelat", "postclasf", "peabody")
+
+tree.2 <- sesame[, features]
+train.2 <- tree.2[train.index,]
+test.2 <- tree.2[-train.index,]
+
+boost.tree <- gbm(site ~., data=train.2,
+                  distribution="multinomial", n.trees=5000,
+                  interaction.depth=1)
+
+#y.boost <- table(true=test.2[,"site"],
+#                 pred=predict(boost.tree, newdata=test.2))
+
+predict(boost.tree, newdata=test.2)
+```
 
 
 
@@ -266,6 +307,6 @@ confusionMatrix(tree.conMatrix)
 
 ## how to interpret the confusion matrix tables for SVM & Trees
 ## How to interpret the imporatnce variance for multiclass classification
-## How to write for SVM interpretations
+## interpretations about the dataset, using the bad performance of the classifiers
 
 
