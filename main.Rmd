@@ -19,6 +19,7 @@ library(dplyr)
 library(tidyr)
 library(tidyverse)
 library(patchwork)
+library(UBL)
 sesame <- read.dta("sesame.dta")
 sesame <- sesame %>%
   mutate(site=factor(site)) %>%
@@ -254,6 +255,8 @@ AIC(lin.mod2)
 lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
 AIC(lin.mod2.full)
 
+summary(lin.mod2)
+
 ```
 
 ```{r}
@@ -416,19 +419,6 @@ ggplot(data=sesame, aes(x=preclasf, y=prerelat, color=site))+
 
 We are looking into dimensionality reduction techniques, more specifically principal component analysis (PCA). By reducing the dimension of our feature space, there will be fewer relationships between variables to consider and we will be less likely to overfit our model. 
 
-```{r PCA}
-
-set.seed(3241)
-
-sesame.sd.covariates <- sesame.sd[, c("female", "male", "sd_age", "sd_pBod", "sd_plet", "sd_pform", "sd_pnumb", "sd_prelat", "sd_pclasf", "sd_peabody")]
-
-pr.out <- prcomp(sesame.sd.covariates, scale = TRUE)
-
-summary(pr.out)
-
-```
-
-
 ```{r test-train-split}
 set.seed(3241)
 
@@ -490,7 +480,8 @@ boxplot(peabody~site, data=sesame)
 ```
 
 
-### Tree
+### Trees
+
 ```{r selecting-features-trees}
 set.seed(3215)
 #tree.data <- sesame %>%
@@ -514,7 +505,6 @@ train.data <- tree.data[train.index,]
 test.data <- tree.data[-train.index,]
 ```
 
-
 ```{r fitting-randomForest}
 rf.tree<- randomForest(site~., data=tree.data, subset=train.index,
                        mtry=4, importance=TRUE)
@@ -530,9 +520,51 @@ confusionMatrix(tree.conMatrix)
 0.42 -- 0.5139 (but not including the test scores.)
 around 0.45-0.48, when including the pretest scores.
 
+As seen in the table above, there is a notable discrepancy in the number of observations that lay in classes 4 and 5 for the variable ``site``. More specifically, in the training data, there are just 25 observations with a value of 4 for the variable ``site`` and just 13 observations with a value of 5 for the variable ``site``. In other words, there are less disadvantaged rural children and disadvantaged Spanish speaking children. 
+
+Consequently, when we initially ran our random forest model, our model was performing worse for test observations that take on the values 4 or 5 for the variable ``site``.
+
+To remedy this problem, we decided to use Synthetic Minority Oversampling Technique (SMOTE).
+
+```{r}
+
+train.data$age <- as.numeric(train.data$age)
+train.data$viewcat <- as.numeric(train.data$viewcat)
+train.data$setting <- as.numeric(train.data$setting)
+train.data$viewenc <- as.factor(train.data$viewenc)
+
+test.data$age <- as.numeric(test.data$age)
+test.data$viewcat <- as.numeric(test.data$viewcat)
+test.data$setting <- as.numeric(test.data$setting)
+test.data$viewenc <- as.factor(test.data$viewenc)
+
+balanced.train.data <- SmoteClassif(site ~ ., train.data, k = 5, repl = FALSE, dist = "HEOM")
+  # k --> represents the number of nearest neighbors (5) used to generate new examples of the minority class
+  # repl = FALSE --> cannot have repetition of examples when performing under-sampling by selecting among the majority class(es) examples
+
+balanced.train.data %>%
+  count(site)
+
+```
+
+```{r re-fitting-randomForest}
+
+rf.tree<- randomForest(site~., data=balanced.train.data,
+                       mtry=4, importance=TRUE)
+
+importance(rf.tree)
+
+rf.pred <- predict(rf.tree, newdata=test.data)
+
+tree.conMatrix <- table(true=test.data[,"site"],
+                         pred=rf.pred)
+confusionMatrix(tree.conMatrix)
+
+```
 
 ```{r fitting-boosting}
-set.seed(231)
+
+set.seed(3215)
 
 # ,"prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", #"postnumb", "postrelat", "postclasf", "peabody"
                    
@@ -551,7 +583,10 @@ boost.tree <- gbm(site ~., data=train.2,
 #y.boost <- table(true=test.2[,"site"],
 #                 pred=predict(boost.tree, newdata=test.2))
 
-predict(boost.tree, newdata=test.2)
+boost.conMatrix <- table(true=test.2$site,
+                         pred=predict(boost.tree, newdata=test.2))
+confusionMatrix(boost.conMatrix)
+
 ```
 
 
