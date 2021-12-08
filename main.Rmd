@@ -393,14 +393,6 @@ Is LASSO necessary here?
 
 ## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
 
-```{r checking-correlation-between-preTestVar}
-# "viewcat", "setting", "viewenc",
-pca.features <- c("age", "prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "peabody")
-
-pca.data <- sesame[, pca.features]
-
-round(cor(pca.data),2)
-```
 
 ```{r}
 ggplot(data=sesame, aes(x=prenumb, y=prelet, color=site))+
@@ -430,23 +422,61 @@ train.data %>%
 ```
 
 ```{r svm-fitting}
+#1	60			
+#2	55			
+#3	64			
+#4	43			
+#5	18	
+
+total.weight <- 60+55+64+43+18
+weight.1 <- total.weight/(5*60)
+weight.2 <- total.weight/(5*55)
+weight.3 <- total.weight/(5*64)  
+weight.4 <- total.weight/(5*43)  
+weight.5 <- total.weight/(5*18)  
+
+
+weight.4 <- 1.5
+weight.5 <- 3
 # Response: site (categorical)
 set.seed(315)
 costs <- c(0.001, 0.01, 0.1, 1, 5, 10, 100)
-gammas <- c(0.1, 0.5, 1, 2, 3, 4)
+# c(0.1, 0.2, 0.5, 0.7, 1, 2, 3, 4)
+gammas <- seq(0, 4, by=0.1)
 
 linear.tune <- tune(svm, site~female+ male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
                     data=train.data, kernel="linear",
-                    ranges=list(cost=costs))
+                    ranges=list(cost=costs),
+                    class.weights=c("1"=weight.1,
+                                    "2"=weight.2,
+                                    "3"=weight.3,
+                                    "4"=weight.4,
+                                    "5"=weight.5),
+                    class.type="one.versus.one")
 
 radial.tune <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
                     data=train.data, kernel="radial",
                     ranges=list(cost=costs, 
-                                gamma=gammas))
+                                gamma=gammas),
+                    class.weights=c("1"=weight.1,
+                                    "2"=weight.2,
+                                    "3"=weight.3,
+                                    "4"=weight.4,
+                                    "5"=weight.5))
 #radial.tune <- tune(svm, site~sex+age+prebody+prelet+preform+prenumb+prerelat+preclasf, 
 #                    data=train.data, kernel="radial",
 #                    ranges=list(cost=costs, 
 #                                gamma=gammas))
+
+sigmoid.tune <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
+                    data=train.data, kernel="sigmoid",
+                    ranges=list(cost=costs, 
+                                gamma=gammas),
+                    class.weights=c("1"=weight.1,
+                                    "2"=weight.2,
+                                    "3"=weight.3,
+                                    "4"=weight.4,
+                                    "5"=weight.5))
 ```
 
 ```{r}
@@ -456,14 +486,32 @@ linear.conMatrix <- table(true=test.data[, "site"],
 radial.conMatrix <- table(true=test.data[, "site"],
                           pred=predict(radial.tune$best.model, newdata=test.data))
 
+sigmoid.conMatrix <- table(true=test.data[, "site"],
+                          pred=predict(sigmoid.tune$best.model, newdata=test.data))
+
 confusionMatrix(linear.conMatrix)
 confusionMatrix(radial.conMatrix)
+confusionMatrix(sigmoid.conMatrix)
+
+predict(linear.tune$best.model, newdata=test.data)
+predict(radial.tune$best.model, newdata=test.data)
+predict(sigmoid.tune$best.model, newdata=test.data)
+test.data$site
 ```
 Radial kernel improves prediction on class 1. 
 
 RBF slightly improved after standardizing? (it seems slightly more likely to predict
 on class 1. ) thought, simpler models still retain the same performance (arguably better)
 sd_age+sd_pBod+sd_plet. But we are still not getting any prediction on class 4 & 5. 
+
+After assign class weights using this formula:
+$$
+w_j =\frac{n}{kn_j} , \text{ n is total number of data points, k is number of classes}
+$$
+Our model begins to make predictions on class 4 & class 5, though at the cost of 
+overall accuracy. If we increase the weight for 4 & 5 to 1.5 and 3 respectively
+the performance of Radial SVM decreases but that of linear SVM increases to be comparable
+to Radial SVM's recorded highest accuracy (a little bit over 0.40).
 
 
 ```{r}
