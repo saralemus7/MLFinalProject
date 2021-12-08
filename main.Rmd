@@ -417,8 +417,6 @@ ggplot(data=sesame, aes(x=preclasf, y=prerelat, color=site))+
 
 ### SVM
 
-We are looking into dimensionality reduction techniques, more specifically principal component analysis (PCA). By reducing the dimension of our feature space, there will be fewer relationships between variables to consider and we will be less likely to overfit our model. 
-
 ```{r test-train-split}
 set.seed(3241)
 
