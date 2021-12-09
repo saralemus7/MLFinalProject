@@ -164,7 +164,7 @@ siteplot / (sexplot + ageplot)
 
 ```
 
-Distribution of Site and Sex are both categorical variables. Distribution of Site has four categories with roughly the same amount of children (ranging from 43 to 64), but one category with far fewer observations (disadvantaged Spanish-speaking). This cateogry has less than half of the observations as the next smallest category, which is a relatively large disparity. We will continue our analysis with caution towards this bias in the data. The distribution of sex is very even - the male category has 115 observations, while the female category has 125 observations. 
+Site and Sex are both categorical variables. Distribution of Site has four categories with roughly the same amount of children (ranging from 43 to 64), but one category with far fewer observations (disadvantaged Spanish-speaking). This category has less than half of the observations as the next smallest category, which is a relatively large disparity. We will continue our analysis with caution towards this bias in the data. The distribution of sex is very even - the male category has 115 observations, while the female category has 125 observations. 
 Age is a numerical variable that appears to be normal and bimodal, with two peaks around 50 and 56. There do not appear to be any extreme outliers in the distribution of age.
 
 ## Q.1 Prediction Question: Can we use linear regression to predict the change in a child's test scores that occur after watching Sesame street (or in some instances, not watching Seasame street)?
@@ -792,7 +792,7 @@ confusionMatrix(boost.conMatrix)
 
 
 ### Questions for OH:
-## anything else needed in EDA?
+## should we transform regular?
 ## Both linear and radial kernels never output predictions for 4 & 5?
 ## polynomial kernel? Which variables to give polynomial terms
 ## use PCA to perform feature selection?
