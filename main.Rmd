@@ -20,6 +20,7 @@ library(tidyr)
 library(tidyverse)
 library(patchwork)
 library(UBL)
+library(scales)
 sesame <- read.dta("sesame.dta")
 sesame <- sesame %>%
   mutate(site=factor(site)) %>%
@@ -171,77 +172,74 @@ Age is a numerical variable that appears to be normal and bimodal, with two peak
 
 ### Linear Regression Models
 
-Here, I am fitting 7 linear regression models. The first 6 models predict a different difference in test score while the last model predicts the total difference in test scores. 
+Here, I am fitting 6 linear regression models. Each of the models predicts a different difference in test score. 
 
 ```{r factor-categoricals}
 
-sesame$site <- as.factor(sesame$site)
-sesame$sex <- as.factor(sesame$sex)
-sesame$viewcat <- as.factor(sesame$viewcat)
-sesame$setting <- as.factor(sesame$setting)
-sesame$viewenc <- as.factor(sesame$viewenc)
+sesame.q1 <- sesame
+
+sesame.q1$site <- as.factor(sesame.q1$site)
+sesame.q1$sex <- as.factor(sesame.q1$sex)
+sesame.q1$viewcat <- as.factor(sesame.q1$viewcat)
+sesame.q1$setting <- as.factor(sesame.q1$setting)
+sesame.q1$viewenc <- as.factor(sesame.q1$viewenc)
 
 ```
 
-```{r create-new-variable}
+```{r}
 
-sesame <- sesame %>%
-  mutate(totDiff = bodyDiff + letDiff + formDiff + numbDiff + relatDiff + clasfDiff)
+# Scaling Variables
+
+sesame.q1$bodyDiff <- rescale(sesame.q1$bodyDiff, to = c(0, 30)) 
+sesame.q1$letDiff <- rescale(sesame.q1$letDiff, to = c(0, 30)) 
+sesame.q1$formDiff <- rescale(sesame.q1$formDiff, to = c(0, 30))
+sesame.q1$numbDiff <- rescale(sesame.q1$numbDiff, to = c(0, 30))
+sesame.q1$relatDiff <- rescale(sesame.q1$relatDiff, to = c(0, 30))
+sesame.q1$clasfDiff <- rescale(sesame.q1$clasfDiff, to = c(0, 30))
 
 ```
+
 
 ```{r}
 
 # Test-Train Split
 
 set.seed(1)
-train <- sample(1:nrow(sesame), nrow(sesame)*0.7)
+train <- sample(1:nrow(sesame.q1), nrow(sesame.q1)*0.7)
+
+training = sesame.q1[train,]
+testing = sesame.q1[-train, ]
 
 ```
 
+Firstly, we factored the following variables to encode them as categoricals: ``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``.
+
+One problem that we envisioned when evaluating the and comparing the different models is that the tests are scored on different scales. For example, the scores for the test on knowledge of body parts (noted by ``bodyDiff``) range from 0-32, while those of the test on letters (noted by ``letDiff``) range from 0-58. To be able to aptly compare the mean squared error (MSE) between models, we also decided to convert each response variable to the same range. More specifically, we scaled each variable to the arbitrary range [0, 30].
+
+Lastly, we randomly split the data between testing and training, using 70% of the data for training and 30% of the data for testing. 
+
 ```{r}
 
-lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
 summary(lin.mod1.full)
 AIC(lin.mod1.full)
 
-yhat <- predict(lin.mod1.full, newdata = sesame[-train,])
-y.test <- sesame[-train, "bodyDiff"]
+yhat <- predict(lin.mod1.full, newdata = testing)
+y.test <- testing[, "bodyDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
 
 ```
 
-```{r LASSO}
-
-# Split data between x and y
-x <- model.matrix(bodyDiff ~ site + sex + age + viewcat + setting + viewenc,sesame)[,-1]
-y <- sesame$bodyDiff
-
-# set seed
-set.seed(1)
-
-# cross validation for lambda
-# I couldn't run cv.glmnet, so I commented it out, make sure to uncomment these calls.
-# cv.out <- cv.glmnet(x, y, alpha = 1) # setting alpha = 1 indicates lasso regression
-
-# optimal lambda value
-#best.lam <- cv.out$lambda.min
-
-# lasso regression model with optimal lambda
-#las.mod <- glmnet(x, y, alpha = 1, lambda = best.lam)
-
-```
-
 ```{r}
 
-lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
 summary(lin.mod2.full)
 AIC(lin.mod2.full)
 
-yhat <- predict(lin.mod2.full, newdata = sesame[-train,])
-y.test <- sesame[-train, "letDiff"]
+yhat <- predict(lin.mod2.full, newdata = testing)
+y.test <- testing[, "letDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -250,12 +248,12 @@ mean((yhat-y.test)^2)
 
 ```{r}
 
-lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
 summary(lin.mod3.full)
 AIC(lin.mod3.full)
 
-yhat <- predict(lin.mod3.full, newdata = sesame[-train,])
-y.test <- sesame[-train, "formDiff"]
+yhat <- predict(lin.mod3.full, newdata = testing)
+y.test <- testing[, "formDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -264,12 +262,12 @@ mean((yhat-y.test)^2)
 
 ```{r}
 
-lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
 summary(lin.mod4.full)
 AIC(lin.mod4.full)
 
-yhat <- predict(lin.mod4.full, newdata = sesame[-train,])
-y.test <- sesame[-train, "numbDiff"]
+yhat <- predict(lin.mod4.full, newdata = testing)
+y.test <- testing[, "numbDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -278,12 +276,12 @@ mean((yhat-y.test)^2)
 
 ```{r}
 
-lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
 summary(lin.mod5.full)
 AIC(lin.mod5.full)
 
-yhat <- predict(lin.mod5.full, newdata = sesame[-train,])
-y.test <- sesame[-train, "relatDiff"]
+yhat <- predict(lin.mod5.full, newdata = testing)
+y.test <- testing[, "relatDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -292,26 +290,12 @@ mean((yhat-y.test)^2)
 
 ```{r}
 
-lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
 summary(lin.mod6.full)
 AIC(lin.mod6.full)
 
-yhat <- predict(lin.mod6.full, newdata = sesame[-train,])
-y.test <- sesame[-train, "clasfDiff"]
-
-# Test MSE
-mean((yhat-y.test)^2)
-
-```
-
-```{r}
-
-lin.mod7.full <- lm(totDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
-summary(lin.mod7.full)
-AIC(lin.mod7.full)
-
-yhat <- predict(lin.mod7.full, newdata = sesame[-train,])
-y.test <- sesame[-train, "totDiff"]
+yhat <- predict(lin.mod6.full, newdata = testing)
+y.test <- testing[, "clasfDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -328,7 +312,7 @@ In the context of a regression tree, the deviance is simply the sum of the squar
 
 set.seed(1)
 
-reg.tree.1 <- tree(bodyDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+reg.tree.1 <- tree(bodyDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.1)
 
 plot(reg.tree.1)
@@ -345,8 +329,8 @@ prune.reg.tree.1  <- prune.tree(reg.tree.1, best = 4)
 plot(prune.reg.tree.1)
 text(prune.reg.tree.1, pretty = 0)
 
-yhat <- predict(prune.reg.tree.1, newdata = sesame[-train,])
-y.test <- sesame[-train, "bodyDiff"]
+yhat <- predict(prune.reg.tree.1, newdata = testing)
+y.test <- testing[, "bodyDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -359,7 +343,7 @@ mean((yhat-y.test)^2)
 
 set.seed(1)
 
-reg.tree.2 <- tree(letDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+reg.tree.2 <- tree(letDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.2)
 
 plot(reg.tree.2)
@@ -376,8 +360,8 @@ prune.reg.tree.2  <- prune.tree(reg.tree.2, best = 3)
 plot(prune.reg.tree.2)
 text(prune.reg.tree.2, pretty = 0)
 
-yhat <- predict(prune.reg.tree.2, newdata = sesame[-train,])
-y.test <- sesame[-train, "letDiff"]
+yhat <- predict(prune.reg.tree.2, newdata = testing)
+y.test <- testing[, "letDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -390,7 +374,7 @@ mean((yhat-y.test)^2)
 
 set.seed(1)
 
-reg.tree.3 <- tree(formDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+reg.tree.3 <- tree(formDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.3)
 
 plot(reg.tree.3)
@@ -407,8 +391,8 @@ prune.reg.tree.3  <- prune.tree(reg.tree.3, best = 2)
 plot(prune.reg.tree.3)
 text(prune.reg.tree.3, pretty = 0)
 
-yhat <- predict(prune.reg.tree.3, newdata = sesame[-train,])
-y.test <- sesame[-train, "formDiff"]
+yhat <- predict(prune.reg.tree.3, newdata = testing)
+y.test <- testing[, "formDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -421,7 +405,7 @@ mean((yhat-y.test)^2)
 
 set.seed(1)
 
-reg.tree.4 <- tree(numbDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+reg.tree.4 <- tree(numbDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.4)
 
 plot(reg.tree.4)
@@ -438,8 +422,8 @@ prune.reg.tree.4  <- prune.tree(reg.tree.4, best = 3)
 plot(prune.reg.tree.4)
 text(prune.reg.tree.4, pretty = 0)
 
-yhat <- predict(prune.reg.tree.4, newdata = sesame[-train,])
-y.test <- sesame[-train, "numbDiff"]
+yhat <- predict(prune.reg.tree.4, newdata = testing)
+y.test <- testing[, "numbDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -452,7 +436,7 @@ mean((yhat-y.test)^2)
 
 set.seed(1)
 
-reg.tree.5 <- tree(relatDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+reg.tree.5 <- tree(relatDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.5)
 
 plot(reg.tree.5)
@@ -469,8 +453,8 @@ prune.reg.tree.5  <- prune.tree(reg.tree.5, best = 5)
 plot(prune.reg.tree.5)
 text(prune.reg.tree.5, pretty = 0)
 
-yhat <- predict(prune.reg.tree.5, newdata = sesame[-train,])
-y.test <- sesame[-train, "relatDiff"]
+yhat <- predict(prune.reg.tree.5, newdata = testing)
+y.test <- testing[, "relatDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -483,7 +467,7 @@ mean((yhat-y.test)^2)
 
 set.seed(1)
 
-reg.tree.6 <- tree(clasfDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+reg.tree.6 <- tree(clasfDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.6)
 
 plot(reg.tree.6)
@@ -500,39 +484,8 @@ prune.reg.tree.6  <- prune.tree(reg.tree.6, best = 2)
 plot(prune.reg.tree.6)
 text(prune.reg.tree.6, pretty = 0)
 
-yhat <- predict(prune.reg.tree.6, newdata = sesame[-train,])
-y.test <- sesame[-train, "clasfDiff"]
-
-# Test MSE
-mean((yhat-y.test)^2)
-
-```
-
-## Model 7
-
-```{r}
-
-set.seed(1)
-
-reg.tree.7 <- tree(totDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
-summary(reg.tree.7)
-
-plot(reg.tree.7)
-text(reg.tree.7, pretty = 0)
-
-cv.reg.tree.7  <- cv.tree(reg.tree.7)
-plot(cv.reg.tree.7$size, cv.reg.tree.7$dev, type = "b")
-
-```
-
-```{r}
-
-prune.reg.tree.7  <- prune.tree(reg.tree.7, best = 2)
-plot(prune.reg.tree.7)
-text(prune.reg.tree.7, pretty = 0)
-
-yhat <- predict(prune.reg.tree.7, newdata = sesame[-train,])
-y.test <- sesame[-train, "totDiff"]
+yhat <- predict(prune.reg.tree.6, newdata = testing)
+y.test <- testing[, "clasfDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
@@ -764,28 +717,28 @@ While the ``SmoteClassif()`` function certainly did its job by balancing out the
 
 ```{r fitting-boosting}
 
-set.seed(3215)
-
-# ,"prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", #"postnumb", "postrelat", "postclasf", "peabody"
-                   
-                   
-
-features <- c("site", "age", "viewcat", "setting", "viewenc","prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", "postnumb", "postrelat", "postclasf", "peabody")
-
-tree.2 <- sesame[, features]
-train.2 <- tree.2[train.index,]
-test.2 <- tree.2[-train.index,]
-
-boost.tree <- gbm(site ~., data=train.2,
-                  distribution="multinomial", n.trees=5000,
-                  interaction.depth=1)
-
-#y.boost <- table(true=test.2[,"site"],
-#                 pred=predict(boost.tree, newdata=test.2))
-
-boost.conMatrix <- table(true=test.2$site,
-                         pred=predict(boost.tree, newdata=test.2))
-confusionMatrix(boost.conMatrix)
+# set.seed(3215)
+# 
+# # ,"prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", #"postnumb", "postrelat", "postclasf", "peabody"
+#                    
+#                    
+# 
+# features <- c("site", "age", "viewcat", "setting", "viewenc","prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", "postnumb", "postrelat", "postclasf", "peabody")
+# 
+# tree.2 <- sesame[, features]
+# train.2 <- tree.2[train.index,]
+# test.2 <- tree.2[-train.index,]
+# 
+# boost.tree <- gbm(site ~., data=train.2,
+#                   distribution="multinomial", n.trees=5000,
+#                   interaction.depth=1)
+# 
+# #y.boost <- table(true=test.2[,"site"],
+# #                 pred=predict(boost.tree, newdata=test.2))
+# 
+# boost.conMatrix <- table(true=test.2$site,
+#                          pred=predict(boost.tree, newdata=test.2))
+# confusionMatrix(boost.conMatrix)
 
 ```
 
