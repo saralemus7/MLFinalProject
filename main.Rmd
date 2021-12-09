@@ -792,7 +792,7 @@ confusionMatrix(boost.conMatrix)
 
 
 ### Questions for OH:
-## anything else needed in EDA?
+## should we transform regular?
 ## Both linear and radial kernels never output predictions for 4 & 5?
 ## polynomial kernel? Which variables to give polynomial terms
 ## use PCA to perform feature selection?
