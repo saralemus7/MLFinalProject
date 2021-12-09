@@ -169,6 +169,8 @@ Age is a numerical variable that appears to be normal and bimodal, with two peak
 
 ## Q.1 Prediction Question: Can we use linear regression to predict the change in a child's test scores that occur after watching Sesame street (or in some instances, not watching Seasame street)?
 
+### Linear Regression Models
+
 Here, I am fitting 7 linear regression models. The first 6 models predict a different difference in test score while the last model predicts the total difference in test scores. 
 
 ```{r factor-categoricals}
@@ -190,25 +192,24 @@ sesame <- sesame %>%
 
 ```{r}
 
-lin.mod1 <- lm(bodyDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
-summary(lin.mod1)
+# Test-Train Split
 
-# training MSE
-mean(summary(lin.mod1)$residuals^2)
+set.seed(1)
+train <- sample(1:nrow(sesame), nrow(sesame)*0.7)
 
-# cross validation metrics
-m1.ctrl <- trainControl(method = "cv", number = 5)
-m1.cv <- train(bodyDiff ~ site + sex + age + viewcat + setting + viewenc,   
-                     data = sesame,                        
-                     trControl = m1.ctrl,              
-                     method = "lm",                      
-                     na.action = na.pass)
-m1.cv
+```
 
-AIC(lin.mod1)
+```{r}
 
 lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+summary(lin.mod1.full)
 AIC(lin.mod1.full)
+
+yhat <- predict(lin.mod1.full, newdata = sesame[-train,])
+y.test <- sesame[-train, "bodyDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
 
 ```
 
@@ -235,161 +236,308 @@ set.seed(1)
 
 ```{r}
 
-lin.mod2 <- lm(letDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
-summary(lin.mod2)
-
-# training MSE
-mean(summary(lin.mod2)$residuals^2)
-
-# cross validation metrics
-m2.ctrl <- trainControl(method = "cv", number = 5)
-m2.cv <- train(letDiff ~ site + sex + age + viewcat + setting + viewenc,   
-                     data = sesame,                        
-                     trControl = m2.ctrl,              
-                     method = "lm",                      
-                     na.action = na.pass)
-m2.cv
-
-AIC(lin.mod2)
-
 lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+summary(lin.mod2.full)
 AIC(lin.mod2.full)
 
-summary(lin.mod2)
+yhat <- predict(lin.mod2.full, newdata = sesame[-train,])
+y.test <- sesame[-train, "letDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
 
 ```
 
 ```{r}
-
-lin.mod3 <- lm(formDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
-summary(lin.mod3)
-
-# training MSE
-mean(summary(lin.mod3)$residuals^2)
-
-# cross validation metrics
-m3.ctrl <- trainControl(method = "cv", number = 5)
-m3.cv <- train(formDiff ~ site + sex + age + viewcat + setting + viewenc,   
-                     data = sesame,                        
-                     trControl = m3.ctrl,              
-                     method = "lm",                      
-                     na.action = na.pass)
-m3.cv
-
-AIC(lin.mod3)
 
 lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+summary(lin.mod3.full)
 AIC(lin.mod3.full)
 
+yhat <- predict(lin.mod3.full, newdata = sesame[-train,])
+y.test <- sesame[-train, "formDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
 ```
 
 ```{r}
-
-lin.mod4 <- lm(numbDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
-summary(lin.mod4)
-
-# training MSE
-mean(summary(lin.mod4)$residuals^2)
-
-# cross validation metrics
-m4.ctrl <- trainControl(method = "cv", number = 5)
-m4.cv <- train(numbDiff ~ site + sex + age + viewcat + setting + viewenc,   
-                     data = sesame,                        
-                     trControl = m4.ctrl,              
-                     method = "lm",                      
-                     na.action = na.pass)
-m4.cv
-
-AIC(lin.mod4)
 
 lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+summary(lin.mod4.full)
 AIC(lin.mod4.full)
 
+yhat <- predict(lin.mod4.full, newdata = sesame[-train,])
+y.test <- sesame[-train, "numbDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
 ```
 
 ```{r}
-
-lin.mod5 <- lm(relatDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
-summary(lin.mod5)
-
-# training MSE
-mean(summary(lin.mod5)$residuals^2)
-
-# cross validation metrics
-m5.ctrl <- trainControl(method = "cv", number = 5)
-m5.cv <- train(relatDiff ~ site + sex + age + viewcat + setting + viewenc,   
-                     data = sesame,                        
-                     trControl = m5.ctrl,              
-                     method = "lm",                      
-                     na.action = na.pass)
-m5.cv
-
-AIC(lin.mod5)
 
 lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+summary(lin.mod5.full)
 AIC(lin.mod5.full)
 
+yhat <- predict(lin.mod5.full, newdata = sesame[-train,])
+y.test <- sesame[-train, "relatDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
 ```
 
 ```{r}
-
-lin.mod6 <- lm(clasfDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
-summary(lin.mod6)
-
-# training MSE
-mean(summary(lin.mod6)$residuals^2)
-
-# cross validation metrics
-m6.ctrl <- trainControl(method = "cv", number = 5)
-m6.cv <- train(clasfDiff ~ site + sex + age + viewcat + setting + viewenc,   
-                     data = sesame,                        
-                     trControl = m6.ctrl,              
-                     method = "lm",                      
-                     na.action = na.pass)
-m6.cv
-
-AIC(lin.mod6)
 
 lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+summary(lin.mod6.full)
 AIC(lin.mod6.full)
 
+yhat <- predict(lin.mod6.full, newdata = sesame[-train,])
+y.test <- sesame[-train, "clasfDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
 ```
 
 ```{r}
-
-lin.mod7 <- lm(totDiff ~ site + sex + age + viewcat + setting + viewenc, data = sesame)
-summary(lin.mod7)
-
-# training MSE
-mean(summary(lin.mod7)$residuals^2)
-
-# cross validation metrics
-m7.ctrl <- trainControl(method = "cv", number = 5)
-m7.cv <- train(totDiff ~ site + sex + age + viewcat + setting + viewenc,   
-                     data = sesame,                        
-                     trControl = m7.ctrl,              
-                     method = "lm",                      
-                     na.action = na.pass)
-m7.cv
-
-AIC(lin.mod7)
 
 lin.mod7.full <- lm(totDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = sesame)
+summary(lin.mod7.full)
 AIC(lin.mod7.full)
+
+yhat <- predict(lin.mod7.full, newdata = sesame[-train,])
+y.test <- sesame[-train, "totDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
 
 ```
 
+### Regression Tree Models 
+
+In the context of a regression tree, the deviance is simply the sum of the squared errors.
+
+## Model 1
 
 ```{r}
 
-# df1 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff", "totDiff"), Training-MSE = c(23.201, 80.703, 13.172), CV-MSE = c(25.361, 87.703, 14.938))
-# table <- kable(df1, caption = "MSE", booktabs=T)
-# kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+set.seed(1)
+
+reg.tree.1 <- tree(bodyDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+summary(reg.tree.1)
+
+plot(reg.tree.1)
+text(reg.tree.1, pretty = 0)
+
+cv.reg.tree.1  <- cv.tree(reg.tree.1)
+plot(cv.reg.tree.1$size, cv.reg.tree.1$dev, type = "b")
 
 ```
 
-Should I look for interactions?
-Is LASSO necessary here?
+```{r}
+
+prune.reg.tree.1  <- prune.tree(reg.tree.1, best = 4)
+plot(prune.reg.tree.1)
+text(prune.reg.tree.1, pretty = 0)
+
+yhat <- predict(prune.reg.tree.1, newdata = sesame[-train,])
+y.test <- sesame[-train, "bodyDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
+```
+
+## Model 2
+
+```{r}
+
+set.seed(1)
+
+reg.tree.2 <- tree(letDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+summary(reg.tree.2)
+
+plot(reg.tree.2)
+text(reg.tree.2, pretty = 0)
+
+cv.reg.tree.2  <- cv.tree(reg.tree.2)
+plot(cv.reg.tree.2$size, cv.reg.tree.2$dev, type = "b")
+
+```
+
+```{r}
+
+prune.reg.tree.2  <- prune.tree(reg.tree.2, best = 3)
+plot(prune.reg.tree.2)
+text(prune.reg.tree.2, pretty = 0)
+
+yhat <- predict(prune.reg.tree.2, newdata = sesame[-train,])
+y.test <- sesame[-train, "letDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
+```
+
+## Model 3
+
+```{r}
+
+set.seed(1)
+
+reg.tree.3 <- tree(formDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+summary(reg.tree.3)
+
+plot(reg.tree.3)
+text(reg.tree.3, pretty = 0)
+
+cv.reg.tree.3  <- cv.tree(reg.tree.3)
+plot(cv.reg.tree.3$size, cv.reg.tree.3$dev, type = "b")
+
+```
+
+```{r}
+
+prune.reg.tree.3  <- prune.tree(reg.tree.3, best = 2)
+plot(prune.reg.tree.3)
+text(prune.reg.tree.3, pretty = 0)
+
+yhat <- predict(prune.reg.tree.3, newdata = sesame[-train,])
+y.test <- sesame[-train, "formDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
+```
+
+## Model 4
+
+```{r}
+
+set.seed(1)
+
+reg.tree.4 <- tree(numbDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+summary(reg.tree.4)
+
+plot(reg.tree.4)
+text(reg.tree.4, pretty = 0)
+
+cv.reg.tree.4  <- cv.tree(reg.tree.4)
+plot(cv.reg.tree.4$size, cv.reg.tree.4$dev, type = "b")
+
+```
+
+```{r}
+
+prune.reg.tree.4  <- prune.tree(reg.tree.4, best = 3)
+plot(prune.reg.tree.4)
+text(prune.reg.tree.4, pretty = 0)
+
+yhat <- predict(prune.reg.tree.4, newdata = sesame[-train,])
+y.test <- sesame[-train, "numbDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
+```
+
+## Model 5
+
+```{r}
+
+set.seed(1)
+
+reg.tree.5 <- tree(relatDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+summary(reg.tree.5)
+
+plot(reg.tree.5)
+text(reg.tree.5, pretty = 0)
+
+cv.reg.tree.5  <- cv.tree(reg.tree.5)
+plot(cv.reg.tree.5$size, cv.reg.tree.5$dev, type = "b")
+
+```
+
+```{r}
+
+prune.reg.tree.5  <- prune.tree(reg.tree.5, best = 5)
+plot(prune.reg.tree.5)
+text(prune.reg.tree.5, pretty = 0)
+
+yhat <- predict(prune.reg.tree.5, newdata = sesame[-train,])
+y.test <- sesame[-train, "relatDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
+```
+
+## Model 6
+
+```{r}
+
+set.seed(1)
+
+reg.tree.6 <- tree(clasfDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+summary(reg.tree.6)
+
+plot(reg.tree.6)
+text(reg.tree.6, pretty = 0)
+
+cv.reg.tree.6  <- cv.tree(reg.tree.6)
+plot(cv.reg.tree.6$size, cv.reg.tree.6$dev, type = "b")
+
+```
+
+```{r}
+
+prune.reg.tree.6  <- prune.tree(reg.tree.6, best = 2)
+plot(prune.reg.tree.6)
+text(prune.reg.tree.6, pretty = 0)
+
+yhat <- predict(prune.reg.tree.6, newdata = sesame[-train,])
+y.test <- sesame[-train, "clasfDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
+```
+
+## Model 7
+
+```{r}
+
+set.seed(1)
+
+reg.tree.7 <- tree(totDiff ~ site + sex + age + viewcat + setting + viewenc, sesame, subset = train)
+summary(reg.tree.7)
+
+plot(reg.tree.7)
+text(reg.tree.7, pretty = 0)
+
+cv.reg.tree.7  <- cv.tree(reg.tree.7)
+plot(cv.reg.tree.7$size, cv.reg.tree.7$dev, type = "b")
+
+```
+
+```{r}
+
+prune.reg.tree.7  <- prune.tree(reg.tree.7, best = 2)
+plot(prune.reg.tree.7)
+text(prune.reg.tree.7, pretty = 0)
+
+yhat <- predict(prune.reg.tree.7, newdata = sesame[-train,])
+y.test <- sesame[-train, "totDiff"]
+
+# Test MSE
+mean((yhat-y.test)^2)
+
+```
 
 ## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
 
@@ -529,6 +677,7 @@ boxplot(peabody~site, data=sesame)
 ### Trees
 
 ```{r selecting-features-trees}
+
 set.seed(3215)
 #tree.data <- sesame %>%
 #  select(site, sex, age, viewcat, setting, viewenc, prebody, prelet, preform, 
@@ -542,16 +691,16 @@ train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
 
 # ,"prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", #"postnumb", "postrelat", "postclasf", "peabody"
                    
-                   
-
 tree.features <- c("site", "age", "viewcat", "setting", "viewenc")
 
 tree.data <- sesame[, tree.features]
 train.data <- tree.data[train.index,]
 test.data <- tree.data[-train.index,]
+
 ```
 
 ```{r fitting-randomForest}
+
 rf.tree<- randomForest(site~., data=tree.data, subset=train.index,
                        mtry=4, importance=TRUE)
 
@@ -562,6 +711,9 @@ rf.pred <- predict(rf.tree, newdata=test.data)
 tree.conMatrix <- table(true=test.data[,"site"],
                          pred=rf.pred)
 confusionMatrix(tree.conMatrix)
+
+varImpPlot(rf.tree)
+
 ```
 0.42 -- 0.5139 (but not including the test scores.)
 around 0.45-0.48, when including the pretest scores.
@@ -570,7 +722,7 @@ As seen in the table above, there is a notable discrepancy in the number of obse
 
 Consequently, when we initially ran our random forest model, our model was performing worse for test observations that take on the values 4 or 5 for the variable ``site``.
 
-To remedy this problem, we decided to use Synthetic Minority Oversampling Technique (SMOTE).
+To remedy this problem, we decided to use Synthetic Minority Oversampling Technique (SMOTE). SMOTE works by generating new samples in the classes of the response variable that are less represented. These new samples are generated using linear combinations of the "k" nearest neighbors in a given class. In this instance, we set $k=5$. 
 
 ```{r}
 
@@ -607,6 +759,8 @@ tree.conMatrix <- table(true=test.data[,"site"],
 confusionMatrix(tree.conMatrix)
 
 ```
+
+While the ``SmoteClassif()`` function certainly did its job by balancing out the number of observations for each value of ``site`` in the training data, the new random forest model (fitted to this new data set) is less accurate and sees little improvement in the detection of ``site`` values of 4 and 5. 
 
 ```{r fitting-boosting}
 
