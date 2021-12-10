@@ -205,3 +205,24 @@ confusionMatrix(sigmoid.w.cm)
 confusionMatrix(poly.w.cm)
 ```
 
+In our initial SVM models, Radial Kernel SVM came with the best performance in
+terms of prediction accuracy, but it was only slightly above 0.30. We came across
+several online resources that stated standardizing the variables and encoding the
+categorical variables have empirically imrpoved SVM models performance (https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf). After we standardized
+the variables and encoded the sex variable (if a data is a male, then it has (1,0)),
+we observed a light improvement in prediction accuracy across all models. However,
+one problem that particularly piqued our interests is that no predictions on class 4
+class 5 are made before & after variable transformation. We then realized that, relatively, class 4 & 5 have less number of data than the other classes. Although
+we'd argue that the proportion not severe enough for us to deem the dataset as an imbalanced one, we used the formula below to assign weights to each class and specify
+"one versus one" comparison, which has been suggested to yield better prediction 
+than "one versus all."
+
+$$
+w_j =\frac{n}{kn_j} , \text{ n is total number of data points, k is number of classes, }n_j \text{ is the number of data in class j}
+$$
+
+After class weight assignment, the SVM models began to make prediction on class 4
+& 5, at the cost of overall accuracy that more test data are being misclassified
+even though a few number of 4&5 are correctly classified. Then, we began to experiment
+with the class weights and increase the class 4 & 5 weights by roughly 0.5, which is 
+arbitrarily chosen, and it boosted linear kernel SVM's prediction accuracy to 0.403.
