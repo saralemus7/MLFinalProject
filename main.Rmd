@@ -22,6 +22,8 @@ library(tidyverse)
 library(patchwork)
 library(UBL)
 library(scales)
+library(kableExtra)
+library(glmnet)
 sesame <- read.dta("sesame.dta")
 sesame <- sesame %>%
   mutate(site=factor(site)) %>%
@@ -213,11 +215,7 @@ testing = sesame.q1[-train, ]
 
 ```
 
-Firstly, we factored the following variables to encode them as categoricals: ``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``.
-
-One problem that we envisioned when evaluating the and comparing the different models is that the tests are scored on different scales. For example, the scores for the test on knowledge of body parts (noted by ``bodyDiff``) range from 0-32, while those of the test on letters (noted by ``letDiff``) range from 0-58. To be able to aptly compare the mean squared error (MSE) between models, we also decided to convert each response variable to the same range. More specifically, we scaled each variable to the arbitrary range [0, 30].
-
-Lastly, we randomly split the data between testing and training, using 70% of the data for training and 30% of the data for testing. 
+Before creating these models, we first factored the following variables to encode them as categoricals: ``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``. One problem that we envisioned when evaluating and comparing the different models is that the tests are scored on different scales. For example, the scores for the test on knowledge of body parts (noted by ``bodyDiff``) range from 0-32, while those of the test on letters (noted by ``letDiff``) range from 0-58. To be able to aptly compare the mean squared error (MSE) between models, we also decided to convert each response variable to the same range. More specifically, we scaled each variable to the arbitrary range [0, 30]. Lastly, we randomly split the data between testing and training, using 70% of the data for training and 30% of the data for testing. 
 
 ```{r}
 
@@ -230,6 +228,35 @@ y.test <- testing[, "bodyDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
+
+```
+
+```{r}
+
+# Split data between x and y
+x.train <- model.matrix(bodyDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
+y.train <- training$bodyDiff
+
+x.test <- model.matrix(bodyDiff~site + sex + age + viewcat + setting + viewenc, testing)[,-1]
+y.test <- testing$bodyDiff
+
+# set seed
+set.seed(1)
+
+# cross validation for lambda
+cv.out <- cv.glmnet(x.train, y.train, alpha = 0) # setting alpha = 0 indicates ridge regression
+
+# optimal lambda value
+best.lam <- cv.out$lambda.min
+
+# ridge regression model with optimal lambda
+ridge.mod1.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
+
+# calculate predictions
+ridge.pred <- predict(ridge.mod1.full, s = best.lam, newx = x.test)
+
+# MSE calculation
+mean((ridge.pred - y.test)^2)
 
 ```
 
@@ -249,6 +276,35 @@ mean((yhat-y.test)^2)
 
 ```{r}
 
+# Split data between x and y
+x.train <- model.matrix(letDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
+y.train <- training$letDiff
+
+x.test <- model.matrix(letDiff~site + sex + age + viewcat + setting + viewenc, testing)[,-1]
+y.test <- testing$letDiff
+
+# set seed
+set.seed(1)
+
+# cross validation for lambda
+cv.out <- cv.glmnet(x.train, y.train, alpha = 0) # setting alpha = 0 indicates ridge regression
+
+# optimal lambda value
+best.lam <- cv.out$lambda.min
+
+# ridge regression model with optimal lambda
+ridge.mod2.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
+
+# calculate predictions
+ridge.pred <- predict(ridge.mod2.full, s = best.lam, newx = x.test)
+
+# MSE calculation
+mean((ridge.pred - y.test)^2)
+
+```
+
+```{r}
+
 lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
 summary(lin.mod3.full)
 AIC(lin.mod3.full)
@@ -258,6 +314,35 @@ y.test <- testing[, "formDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
+
+```
+
+```{r}
+
+# Split data between x and y
+x.train <- model.matrix(formDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
+y.train <- training$formDiff
+
+x.test <- model.matrix(formDiff~site + sex + age + viewcat + setting + viewenc, testing)[,-1]
+y.test <- testing$formDiff
+
+# set seed
+set.seed(1)
+
+# cross validation for lambda
+cv.out <- cv.glmnet(x.train, y.train, alpha = 0) # setting alpha = 0 indicates ridge regression
+
+# optimal lambda value
+best.lam <- cv.out$lambda.min
+
+# ridge regression model with optimal lambda
+ridge.mod3.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
+
+# calculate predictions
+ridge.pred <- predict(ridge.mod3.full, s = best.lam, newx = x.test)
+
+# MSE calculation
+mean((ridge.pred - y.test)^2)
 
 ```
 
@@ -277,6 +362,35 @@ mean((yhat-y.test)^2)
 
 ```{r}
 
+# Split data between x and y
+x.train <- model.matrix(numbDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
+y.train <- training$numbDiff
+
+x.test <- model.matrix(numbDiff~site + sex + age + viewcat + setting + viewenc, testing)[,-1]
+y.test <- testing$numbDiff
+
+# set seed
+set.seed(1)
+
+# cross validation for lambda
+cv.out <- cv.glmnet(x.train, y.train, alpha = 0) # setting alpha = 0 indicates ridge regression
+
+# optimal lambda value
+best.lam <- cv.out$lambda.min
+
+# ridge regression model with optimal lambda
+ridge.mod4.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
+
+# calculate predictions
+ridge.pred <- predict(ridge.mod4.full, s = best.lam, newx = x.test)
+
+# MSE calculation
+mean((ridge.pred - y.test)^2)
+
+```
+
+```{r}
+
 lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
 summary(lin.mod5.full)
 AIC(lin.mod5.full)
@@ -291,6 +405,35 @@ mean((yhat-y.test)^2)
 
 ```{r}
 
+# Split data between x and y
+x.train <- model.matrix(relatDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
+y.train <- training$relatDiff
+
+x.test <- model.matrix(relatDiff~site + sex + age + viewcat + setting + viewenc, testing)[,-1]
+y.test <- testing$relatDiff
+
+# set seed
+set.seed(1)
+
+# cross validation for lambda
+cv.out <- cv.glmnet(x.train, y.train, alpha = 0) # setting alpha = 0 indicates ridge regression
+
+# optimal lambda value
+best.lam <- cv.out$lambda.min
+
+# ridge regression model with optimal lambda
+ridge.mod5.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
+
+# calculate predictions
+ridge.pred <- predict(ridge.mod5.full, s = best.lam, newx = x.test)
+
+# MSE calculation
+mean((ridge.pred - y.test)^2)
+
+```
+
+```{r}
+
 lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
 summary(lin.mod6.full)
 AIC(lin.mod6.full)
@@ -300,6 +443,35 @@ y.test <- testing[, "clasfDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
+
+```
+
+```{r}
+
+# Split data between x and y
+x.train <- model.matrix(clasfDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
+y.train <- training$clasfDiff
+
+x.test <- model.matrix(clasfDiff~site + sex + age + viewcat + setting + viewenc, testing)[,-1]
+y.test <- testing$clasfDiff
+
+# set seed
+set.seed(1)
+
+# cross validation for lambda
+cv.out <- cv.glmnet(x.train, y.train, alpha = 0) # setting alpha = 0 indicates ridge regression
+
+# optimal lambda value
+best.lam <- cv.out$lambda.min
+
+# ridge regression model with optimal lambda
+ridge.mod6.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
+
+# calculate predictions
+ridge.pred <- predict(ridge.mod6.full, s = best.lam, newx = x.test)
+
+# MSE calculation
+mean((ridge.pred - y.test)^2)
 
 ```
 
@@ -490,6 +662,16 @@ y.test <- testing[, "clasfDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
+
+```
+
+```{r}
+
+df1 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff"), Linear.Regression.Test.MSE = c(32.45, 24.45, 23.19, 28.24, 23.64, 65.41), Ridge.Regression.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26 ), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
+
+table <- kable(df1, caption = "Test Metrics", booktabs=T)
+kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+
 
 ```
 
