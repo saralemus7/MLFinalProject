@@ -5,4 +5,203 @@ date: "12/9/2021"
 output: pdf_document
 ---
 
+```{r loading-libraries}
+library(foreign)
+library(tidyverse)
+library(e1071)
+library(tree)
+library(gbm)
+library(randomForest)
+library(caret)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(patchwork)
+library(UBL)
+library(scales)
+sesame <- read.dta("sesame.dta")
+sesame <- sesame %>%
+  mutate(site=factor(site)) %>%
+  mutate(bodyDiff = postbody - prebody,
+         letDiff = postlet - prelet,
+         formDiff = postform - preform,
+         numbDiff = postnumb - prenumb,
+         relatDiff = postrelat - prerelat,
+         clasfDiff = postclasf - preclasf)
+sesame.sd <- sesame%>%
+  mutate(sd_pBod = scale(prebody, center = TRUE, scale = TRUE),
+         sd_plet = scale(prelet, center = TRUE, scale = TRUE),
+         sd_pform = scale(preform, center = TRUE, scale = TRUE),
+         sd_pnumb = scale(prenumb, center = TRUE, scale = TRUE),
+         sd_prelat = scale(prerelat, center = TRUE, scale = TRUE),
+         sd_pclasf = scale(preclasf, center = TRUE, scale = TRUE),
+         sd_peabody = scale(peabody, center = TRUE, scale = TRUE), 
+         sd_age = scale(age, center =TRUE, scale = TRUE),
+         male=if_else(sex==1, 1, 0),
+         female=if_else(sex==2, 1, 0))
+```
+
+## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
+
+### SVM
+```{r test-train-split}
+set.seed(3241)
+
+n <- nrow(sesame)
+train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
+train.data <- sesame.sd[train.index,]
+test.data <- sesame.sd[-train.index,]
+
+train.data %>%
+  count(site)
+```
+
+```{r svm-fitting-without-classWeight}
+set.seed(315)
+costs <- c(0.001, 0.01, 0.1, 1, 5, 10, 100)
+# c(0.1, 0.2, 0.5, 0.7, 1, 2, 3, 4)
+gammas <- seq(0, 4, by=0.1)
+degrees <- c(1,2,3,4,5)
+
+linear.tune <- tune(svm, site~female+ male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
+                    data=train.data, kernel="linear",
+                    ranges=list(cost=costs))
+
+radial.tune <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
+                    data=train.data, kernel="radial",
+                    ranges=list(cost=costs, 
+                                gamma=gammas))
+
+sigmoid.tune <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
+                    data=train.data, kernel="sigmoid",
+                    ranges=list(cost=costs, 
+                                gamma=gammas))
+
+poly.tune <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody,
+                  data=train.data, kernel="polynomial",
+                  ranges=list(cost=costs,
+                              degree=degrees))
+```
+
+```{r svm-confmatrix}
+linear.cm <- table(true=test.data[, "site"],
+                          pred=predict(linear.tune$best.model, newdata=test.data))
+
+radial.cm <- table(true=test.data[, "site"],
+                          pred=predict(radial.tune$best.model, newdata=test.data))
+
+sigmoid.cm <- table(true=test.data[,"site"], 
+                    pred=predict(sigmoid.tune$best.model, newdata=test.data))
+
+poly.cm <- table(true=test.data[, "site"],
+                 pred=predict(poly.tune$best.model, newdata=test.data))
+```
+
+```{r}
+confusionMatrix(linear.cm)
+```
+
+```{r}
+confusionMatrix(radial.cm)
+```
+
+```{r}
+confusionMatrix(sigmoid.cm)
+```
+
+```{r}
+confusionMatrix(poly.cm)
+```
+
+```{r classWeight-assigning}
+set.seed(315)
+total.weight <- 60+55+64+43+18
+weight.1 <- total.weight/(5*60)
+weight.2 <- total.weight/(5*55)
+weight.3 <- total.weight/(5*64)  
+weight.4 <- total.weight/(5*43)  
+weight.5 <- total.weight/(5*18)  
+
+#increase the weight of class 4 & 5 by a little bit over 0.4(chosen arbitraily)
+weight.4 <- 1.5
+weight.5 <- 3
+
+linear.weighted <- tune(svm, site~female+ male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
+                    data=train.data, kernel="linear",
+                    ranges=list(cost=costs),
+                    class.weights=c("1"=weight.1,
+                                    "2"=weight.2,
+                                    "3"=weight.3,
+                                    "4"=weight.4,
+                                    "5"=weight.5),
+                    class.type="one.versus.one")
+
+radial.weighted <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
+                    data=train.data, kernel="radial",
+                    ranges=list(cost=costs, 
+                                gamma=gammas),
+                    class.weights=c("1"=weight.1,
+                                    "2"=weight.2,
+                                    "3"=weight.3,
+                                    "4"=weight.4,
+                                    "5"=weight.5),
+                    class.type="one.versus.one")
+#radial.tune <- tune(svm, site~sex+age+prebody+prelet+preform+prenumb+prerelat+preclasf, 
+#                    data=train.data, kernel="radial",
+#                    ranges=list(cost=costs, 
+#                                gamma=gammas))
+
+sigmoid.weighted <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
+                    data=train.data, kernel="sigmoid",
+                    ranges=list(cost=costs, 
+                                gamma=gammas),
+                    class.weights=c("1"=weight.1,
+                                    "2"=weight.2,
+                                    "3"=weight.3,
+                                    "4"=weight.4,
+                                    "5"=weight.5),
+                    class.type="one.versus.one")
+
+poly.weighted <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
+                    data=train.data, kernel="sigmoid",
+                    ranges=list(cost=costs, 
+                                degree=degrees),
+                    class.weights=c("1"=weight.1,
+                                    "2"=weight.2,
+                                    "3"=weight.3,
+                                    "4"=weight.4,
+                                    "5"=weight.5),
+                    class.type="one.versus.one")
+```
+
+```{r}
+linear.w.cm <- table(true=test.data[, "site"],
+                          pred=predict(linear.weighted$best.model, newdata=test.data))
+
+radial.w.cm <- table(true=test.data[, "site"],
+                          pred=predict(radial.weighted$best.model, newdata=test.data))
+
+sigmoid.w.cm <- table(true=test.data[,"site"], 
+                    pred=predict(sigmoid.weighted$best.model, newdata=test.data))
+
+poly.w.cm <- table(true=test.data[, "site"],
+                 pred=predict(poly.weighted$best.model, newdata=test.data))
+```
+
+```{r}
+confusionMatrix(linear.w.cm)
+```
+
+```{r}
+confusionMatrix(radial.w.cm)
+```
+
+```{r}
+confusionMatrix(sigmoid.w.cm)
+```
+
+```{r}
+confusionMatrix(poly.w.cm)
+```
 
