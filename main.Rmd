@@ -11,6 +11,7 @@ library(foreign)
 library(tidyverse)
 library(e1071)
 library(tree)
+library(nnet)
 library(gbm)
 library(randomForest)
 library(caret)
@@ -742,6 +743,35 @@ While the ``SmoteClassif()`` function certainly did its job by balancing out the
 
 ```
 
+
+### Logistic Regression
+```{r}
+# ,"prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", #"postnumb", "postrelat", "postclasf", "peabody"
+                   
+tree.features <- c("site", "age", "viewcat", "setting", "viewenc","prebody", "prelet","preform", "prenumb", "prerelat", "preclasf")
+
+tree.log <- sesame[, tree.features]
+train.log <- tree.log[train.index,]
+test.log <- tree.log[-train.index,]
+
+multinom.log <- multinom(factor(site)~., data=train.log)
+
+
+summary(multinom.log)
+
+tabs <- table(true=test.log[, "site"],
+              pred=predict(multinom.log,newdata=test.log))
+confusionMatrix(tabs)
+
+##forward selection
+log.tune <- train(site~(.)^2, data=train.log, method="multinom", direction="forward",
+                  k=log(3562))
+
+summary(log.tune)
+tabs2 <- table(true=test.log[, "site"],
+              pred=predict(log.tune,newdata=test.log))
+confusionMatrix(tabs2)
+```
 
 
 ### Questions for OH:
