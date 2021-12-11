@@ -1,9 +1,14 @@
 ---
-title: "Report"
-author: "Sara Lemus"
+title: "STA 325L Final Report"
+author: "Angela Wang, QiHan Zhou, Matthew Murray, Michelle Mao, Sara Lemus, Sophie Dalldorf"
 date: "12/9/2021"
 output: pdf_document
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=F, message=F)
+knitr::opts_chunk$set(fig.pos = "h", out.extra = "")
+```
 
 ```{r loading-libraries}
 library(foreign)
@@ -20,6 +25,7 @@ library(tidyverse)
 library(patchwork)
 library(UBL)
 library(scales)
+library(kableExtra)
 sesame <- read.dta("sesame.dta")
 sesame <- sesame %>%
   mutate(site=factor(site)) %>%
@@ -41,6 +47,34 @@ sesame.sd <- sesame%>%
          male=if_else(sex==1, 1, 0),
          female=if_else(sex==2, 1, 0))
 ```
+
+## Q.1 Prediction Question: Can we use linear regression to predict the change in a child's test scores that occur after watching Sesame street (or in some instances, not watching Sesame street)?
+
+We decided to utilize three different types of models to gain inference and predict the difference in test scores that occurs after subjects watch Sesame Street: (1) least-squares regression model (2) ridge regression model and (3) regression tree model. There are six different test scores in the data set, so we fit three models for each difference in test score variable. Each model took the following variables as covariates:``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``. Before creating these models, we factored those variables to encode them as categoricals. The least-squares and ridge regression models also took into account all possible two-way interaction terms between the variables.
+
+One problem that we envisioned when evaluating and comparing the different models is that the tests are scored on different scales. For example, the scores for the test on knowledge of body parts (noted by ``bodyDiff``) range from 0-32, while those of the test on letters (noted by ``letDiff``) range from 0-58. To be able to aptly compare the mean squared error (MSE) between models, we also decided to convert each response variable to the same range. More specifically, we scaled each variable to the arbitrary range [0, 30]. Lastly, we randomly split the data between testing and training, using 70% of the data for training and 30% of the data for testing.
+
+We first decided to use least-squares regression models due to the fact that they provide apt inference into the relationship between the covariates and the response variable. Thereafter, we decided to use a ridge regression model due to the fact that ridge regression often provides performance improvements by shrinking slope coefficients. While shrinkage may introduce bias to a model, it decreases the variance and increases the precision of the slope coefficient estimates. The shrinkage is achieved by applying a shrinkage parameter, $\lambda$, to the Euclidean norm of a slope coefficient. Doing so slightly increases the bias of our model (as least-squares regression coefficient estimates are unbiased) but can also significantly decrease the variance (and increase the precision) of our regression coefficients. This slight increase in bias but significant decrease in variance usually decreases the MSE of a model.
+
+We tuned our $\lambda$ parameter using 10-fold cross validation. More specifically, we computed the cross-validation error rate for our model for a grid of $\lambda$ values. Thereafter, we selected the $\lambda$ value for which the cross-validation error is the smallest. 
+
+Initially, we were inclined to use least absolute shrinkage and selection operator (LASSO) regression. The main advantage of LASSO regression over ridge regression is that LASSO regression performs variable selection by setting the slope coefficients of inert predictors to 0. The reason why we initially thought that LASSO regression would work better than ridge regression is that in most of our linear models, only a small subset of variables are significant at a 95% significance level.  However, our ridge regression models performed marginally better than our LASSO regression models, so for this reason, we decided to report the MSE’s for the ridge regression models. 
+
+~Talk about why we chose regression tree models~
+
+```{r}
+
+df1 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff"), Least.Regression.Test.MSE = c(32.45, 24.45, 23.19, 28.24, 23.64, 65.41), Ridge.Regression.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26 ), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
+
+table <- kable(df1, caption = "Test Metrics", booktabs=T)
+kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+
+
+```
+
+From the results of the above table, one can see that the ridge regression models have the best performance, although the performance of the regression trees are very similar . For each response variable except ``bodyDiff``, the ridge regression model reports the lowest test MSE, although the difference in performance between the ridge regression and the regression tree is very marginal. 
+
+
 
 ## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
 

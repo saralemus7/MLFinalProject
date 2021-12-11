@@ -171,7 +171,7 @@ siteplot / (sexplot + ageplot)
 Site and Sex are both categorical variables. Distribution of Site has four categories with roughly the same amount of children (ranging from 43 to 64), but one category with far fewer observations (disadvantaged Spanish-speaking). This category has less than half of the observations as the next smallest category, which is a relatively large disparity. We will continue our analysis with caution towards this bias in the data. The distribution of sex is very even - the male category has 115 observations, while the female category has 125 observations. 
 Age is a numerical variable that appears to be normal and bimodal, with two peaks around 50 and 56. There do not appear to be any extreme outliers in the distribution of age.
 
-## Q.1 Prediction Question: Can we use linear regression to predict the change in a child's test scores that occur after watching Sesame street (or in some instances, not watching Seasame street)?
+## Q.1 Prediction Question: Can we use linear regression to predict the change in a child's test scores that occur after watching Sesame street (or in some instances, not watching Sesame street)?
 
 ### Linear Regression Models
 
@@ -667,10 +667,10 @@ mean((yhat-y.test)^2)
 
 ```{r}
 
-df1 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff"), Linear.Regression.Test.MSE = c(32.45, 24.45, 23.19, 28.24, 23.64, 65.41), Ridge.Regression.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26 ), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
-
-table <- kable(df1, caption = "Test Metrics", booktabs=T)
-kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+# df1 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff"), Least.Regression.Test.MSE = c(32.45, 24.45, 23.19, 28.24, 23.64, 65.41), Ridge.Regression.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26 ), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
+# 
+# table <- kable(df1, caption = "Test Metrics", booktabs=T)
+# kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
 
 
 ```
