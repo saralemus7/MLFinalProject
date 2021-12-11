@@ -51,13 +51,10 @@ sesame.sd <- sesame%>%
 
 # Introduction
 
-## Research Question #1
-
-Can we use linear regression to predict the change in a child's test scores that occur after watching Sesame street (or in some instances, not watching Sesame street)?
 
 # Methodology 
 
-## Question 1
+## Research Question 1
 
 We decided to utilize three different types of models to gain inference and predict the difference in test scores that occurs after subjects watch Sesame Street: (1) least-squares regression model (2) ridge regression model and (3) regression tree model. There are six different test scores in the data set, so we fit three models for each difference in test score variable. Each model took the following variables as covariates: ``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``. Before creating these models, we factored those variables to encode them as categoricals. Initially, our least-squares and ridge regression models also took into account all possible two-way interaction terms between the variables. However, we noticed that both the Akaike Information Criterion (AIC) and adjusted-$R^2$ values were higher for models that did not include any interaction effects. That reason, coupled with the lack of apparent interaction effects in our exploratory data analysis and the fact that we wanted our linear models to be very interpretable, is why we decided not to include any interaction effects in our final linear models. 
 
@@ -73,28 +70,24 @@ Initially, we were inclined to use least absolute shrinkage and selection operat
 
 In the context of a regression tree, the deviance is simply the sum of the squared errors.
 
-## Question 2
+## Research Question 2
+In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification tree and a logistic model to answer this question as well; however, these models did not perform as well on our data (See Appendix for more details). Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is:
+$$
+svm(site \mathtt{\sim} female + male + age + bodyparts_{pretest}+ letters_{pretest} + 
+\\ forms_{pretest} +numbers_{pretest} + relationalterms_{pretest} + classificationskills_{pretest} )
+$$
 
-In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the female, male, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification Random Forest model to answer this question as well; the tree model would allow us to plot importance measures to see which feature(s) are the most 'important'. 
-
-Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is: (add formula) (Maybe present Tree as well? the tree accuracy is higher, not by much though)
-
-We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. To improve our model’s predictive power, we implemented a variety of different methods. We tested our model using linear, radial, and sigmoid kernels and compared the predictive accuracy between these models. Since we are interested in high predictive power and the radial kernel had the highest prediction accuracy, we chose this kernel.
-
-Standardizing the predictor variables in SVM and encoding categorical variables has been shown to improve performance for SVMs (https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf). Thus, we used the standardized forms of the continuous variables in our model and encoded the sex variable so that if a child was a male we would code that as 1. We did indeed observe a small improvement in prediction accuracy across all models. However, one problem that particularly piqued our interests is that we are making no predictions for sites 4 or 5. This could be due to sites 4 & 5 having a smaller number of observations than the other classes. Thus, we used the class weight formula below to assign weights to each class and specify "one versus one" comparison, which has been suggested to yield better prediction than "one versus all."
+We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. Since we are interested in high predictive power, we implemented a variety of different methods. Standardizing the predictor variables in SVM and encoding categorical variables has been shown to improve performance for SVMs [1]. Thus, we used the standardized forms of the continuous variables in our model and encoded the female and male variables. We did indeed observe a small improvement in prediction accuracy across all models. However, one problem that particularly piqued our interests is that we are making no predictions for classes 4 or 5 for site. This could be due to sites 4 & 5 having a smaller number of observations than the other classes. Thus, we used the class weight formula below to assign weights to each class and specify "one versus one" comparison, which has been suggested to yield better prediction than "one versus all" [2].
 
 $$
 w_j =\frac{n}{kn_j} , \text{ n is total number of data points, k is number of classes, }n_j \text{ is the number of data in class j}
 $$
 
-After the class weight assignment, the SVM models began to make prediction on class 4
-& 5. However, doing so came at the cost of overall accuracy. Thus, more of the other observations are being misclassified, but the few observations of class 4&5 are correctly classified. To remedy this issue, we began to experiment with the class weights and increase the class 4 & 5 weights by roughly 0.5, which is arbitrarily chosen, and it boosted linear kernel SVM's prediction accuracy to 0.403.
-
+We tested our model using linear, radial, sigmoid, and polynomial kernels and compared the predictive accuracy between these models. After the class weight assignment, the SVM models began to make prediction on class 4&5. However, doing so came at the cost of overall accuracy. Thus, more of the other observations are being misclassified, but the few observations of sites 4&5 are correctly classified. To remedy this issue, we began to experiment with the class weights and increase the sites 4&5 weights by roughly 0.5 until we reached the highest predictive power. The model with the highest accuracy was the linear kernel SVM with weights 0.8 on site 1, 0.87 on site 2, 0.75 on site 3, 1.5 on site 4, and 3 on site 5 and a cross validation selected cost parameter of 0.1. Since this model has the highest predictive accuracy of all others that we had tried, we settled on this model as our final model. There are no explicit tests for SVM model diagnostics; however, there seems to be no major issue with our model fit.
 
 # Results
 
-Linear Regression Models
-
+## Research Question 1 
 
 ```{r}
 
@@ -103,8 +96,6 @@ Least.Squares.Regression.Test.MSE = c(24.01, 14.31, 13.26, 15.51, 18.94, 48.40),
 
 table <- kable(df1, caption = "Test Metrics", booktabs=T)
 kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
-
-
 ```
 
 From the results of the above table, one can see that the ridge regression models have the best performance, although the performance of the regression trees are very similar . For each response variable except ``bodyDiff``, the ridge regression model reports the lowest test MSE, although the difference in performance between the ridge regression and the regression tree is very marginal. 
@@ -122,7 +113,61 @@ all.accuracy <- kable(classfMod.tab, caption = "Classification Model Accuracy Ta
 kable_styling(all.accuracy, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
 ```
 
-```{r echo=FALSE, results='hide'}
+## Research Question 2
+
+```{r test-train-split}
+set.seed(3241)
+
+n <- nrow(sesame)
+train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
+train.data <- sesame.sd[train.index,]
+test.data <- sesame.sd[-train.index,]
+```
+
+```{r classWeight-assigning}
+set.seed(315)
+costs <- c(0.001, 0.01, 0.1, 1, 5, 10, 100)
+total.weight <- 60+55+64+43+18
+weight.1 <- total.weight/(5*60)
+weight.2 <- total.weight/(5*55)
+weight.3 <- total.weight/(5*64)  
+weight.4 <- total.weight/(5*43)  
+weight.5 <- total.weight/(5*18)  
+
+#increase the weight of class 4 & 5 by a little bit over 0.4(chosen arbitraily)
+weight.4 <- 1.5
+weight.5 <- 3
+
+linear.weighted <- tune(svm, site~female+ male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
+                    data=train.data, kernel="linear",
+                    ranges=list(cost=costs),
+                    class.weights=c("1"=weight.1,
+                                    "2"=weight.2,
+                                    "3"=weight.3,
+                                    "4"=weight.4,
+                                    "5"=weight.5),
+                    class.type="one.versus.one")
+
+linear.w.cm <- table(true=test.data[, "site"],
+                          pred=predict(linear.weighted$best.model, newdata=test.data))
+```
+
+```{r, include = F}
+confusionMatrix(linear.w.cm)
+```
+
+As evidenced in the table below, the class weighted linear kernel SVM has a prediction accuracy of 0.403 on our test data with a confidence interval of 0.289 to 0.525. From the confusion matrix, we can also see that our model predicts well for classes 2 and 3 and struggles slightly with clases 1,4, and 5. Specifically, our model has tends to predict class 3 often when the true class is 4, and it tends to predict classes 3 and 5 as commonly as class 1 when the true class is 1.
+
+```{r}
+ressvm <- data.frame(Results = c("Accuracy", "95% CI"),
+                     Values = c("0.403", "(0.289, 0.525)"))
+
+ 
+table.svm.res <- kable(ressvm, caption = "Class Weighted Linear Kernel SVM Prediction Results", booktabs=T)
+kable_styling(table.svm.res, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+```
+
+```{r}
 
 svmTab <- data.frame(Truth = c("Class 1", "Class 2", "Class 3", "Class 4", "Class 5"), 
                      Class1.Prediction = c(6,1,0,3,0), 
@@ -131,17 +176,21 @@ svmTab <- data.frame(Truth = c("Class 1", "Class 2", "Class 3", "Class 4", "Clas
                      class4.Prediction = c(2,1,1,3,1),
                      class5.Prediction = c(5,3,3,0,2))
  
-table.svm.cm <- kable(svmTab, caption = "Linear Kernel SVM (Class reweighted) Confusion Matrix", booktabs=T)
+table.svm.cm <- kable(svmTab, caption = "Class Weighted Linear Kernel SVM Confusion Matrix", booktabs=T)
 kable_styling(table.svm.cm, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
 ```
-
 
 # Conclusion 
 
 # Appendix
 
-```{r factor-categoricals}
+## References
+[1] A Practical Guide to Support Vector Machines. (2003). National Taiwan University. https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
 
+[2] One-vs-Rest and One-vs-One for Mutli-Class Classification. (2020). Machine Learning Mastery. https://machinelearningmastery.com/one-vs-rest-and-one-vs-one-for-multi-class-classification/
+
+## Models
+```{r factor-categoricals}
 sesame.q1 <- sesame
 
 sesame.q1$site <- as.factor(sesame.q1$site)
@@ -149,36 +198,28 @@ sesame.q1$sex <- as.factor(sesame.q1$sex)
 sesame.q1$viewcat <- as.factor(sesame.q1$viewcat)
 sesame.q1$setting <- as.factor(sesame.q1$setting)
 sesame.q1$viewenc <- as.factor(sesame.q1$viewenc)
-
 ```
 
 ```{r}
-
 # Scaling Variables
-
 sesame.q1$bodyDiff <- rescale(sesame.q1$bodyDiff, to = c(0, 30)) 
 sesame.q1$letDiff <- rescale(sesame.q1$letDiff, to = c(0, 30)) 
 sesame.q1$formDiff <- rescale(sesame.q1$formDiff, to = c(0, 30))
 sesame.q1$numbDiff <- rescale(sesame.q1$numbDiff, to = c(0, 30))
 sesame.q1$relatDiff <- rescale(sesame.q1$relatDiff, to = c(0, 30))
 sesame.q1$clasfDiff <- rescale(sesame.q1$clasfDiff, to = c(0, 30))
-
 ```
 
 ```{r}
-
 # Test-Train Split
-
 set.seed(1)
 train <- sample(1:nrow(sesame.q1), nrow(sesame.q1)*0.7)
 
 training = sesame.q1[train,]
-testing = sesame.q1[-train, ]
-
+testing =sesame.q1[-train, ]
 ```
 
 ```{r}
-
 lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod1.full)
 AIC(lin.mod1.full)
@@ -188,11 +229,9 @@ y.test <- testing[, "bodyDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
-
 ```
 
 ```{r}
-
 # Split data between x and y
 x.train <- model.matrix(bodyDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
 y.train <- training$bodyDiff
@@ -217,11 +256,9 @@ ridge.pred <- predict(ridge.mod1.full, s = best.lam, newx = x.test)
 
 # MSE calculation
 mean((ridge.pred - y.test)^2)
-
 ```
 
 ```{r}
-
 lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod2.full)
 AIC(lin.mod2.full)
@@ -231,12 +268,9 @@ y.test <- testing[, "letDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
-
 ```
 
-
 ```{r}
-
 # Split data between x and y
 x.train <- model.matrix(letDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
 y.train <- training$letDiff
@@ -261,25 +295,20 @@ ridge.pred <- predict(ridge.mod2.full, s = best.lam, newx = x.test)
 
 # MSE calculation
 mean((ridge.pred - y.test)^2)
-
 ```
 
 ```{r}
-
 lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod3.full)
 AIC(lin.mod3.full)
 
 yhat <- predict(lin.mod3.full, newdata = testing)
 y.test <- testing[, "formDiff"]
-
 # Test MSE
 mean((yhat-y.test)^2)
-
 ```
 
 ```{r}
-
 # Split data between x and y
 x.train <- model.matrix(formDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
 y.train <- training$formDiff
@@ -304,11 +333,9 @@ ridge.pred <- predict(ridge.mod3.full, s = best.lam, newx = x.test)
 
 # MSE calculation
 mean((ridge.pred - y.test)^2)
-
 ```
 
 ```{r}
-
 lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod4.full)
 AIC(lin.mod4.full)
@@ -318,11 +345,9 @@ y.test <- testing[, "numbDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
-
 ```
 
 ```{r}
-
 # Split data between x and y
 x.train <- model.matrix(numbDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
 y.train <- training$numbDiff
@@ -347,11 +372,9 @@ ridge.pred <- predict(ridge.mod4.full, s = best.lam, newx = x.test)
 
 # MSE calculation
 mean((ridge.pred - y.test)^2)
-
 ```
 
 ```{r}
-
 lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod5.full)
 AIC(lin.mod5.full)
@@ -361,11 +384,9 @@ y.test <- testing[, "relatDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
-
 ```
 
 ```{r}
-
 # Split data between x and y
 x.train <- model.matrix(relatDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
 y.train <- training$relatDiff
@@ -390,11 +411,9 @@ ridge.pred <- predict(ridge.mod5.full, s = best.lam, newx = x.test)
 
 # MSE calculation
 mean((ridge.pred - y.test)^2)
-
 ```
 
 ```{r}
-
 lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod6.full)
 AIC(lin.mod6.full)
@@ -404,11 +423,9 @@ y.test <- testing[, "clasfDiff"]
 
 # Test MSE
 mean((yhat-y.test)^2)
-
 ```
 
 ```{r}
-
 # Split data between x and y
 x.train <- model.matrix(clasfDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
 y.train <- training$clasfDiff
@@ -433,15 +450,13 @@ ridge.pred <- predict(ridge.mod6.full, s = best.lam, newx = x.test)
 
 # MSE calculation
 mean((ridge.pred - y.test)^2)
-
 ```
 
-### Regression Tree Models 
+## Regression Tree Models 
 
-## Model 1
+### Model 1
 
 ```{r}
-
 set.seed(1)
 
 reg.tree.1 <- tree(bodyDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
@@ -625,39 +640,11 @@ mean((yhat-y.test)^2)
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
 
-### SVM
-```{r test-train-split}
-set.seed(3241)
+### Extra SVM models
 
-n <- nrow(sesame)
-train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
-train.data <- sesame.sd[train.index,]
-test.data <- sesame.sd[-train.index,]
-
-train.data %>%
-  count(site)
-```
-
-```{r svm-fitting-without-classWeight}
+```{r svm-fitting-without-classWeight, eval= F}
 set.seed(315)
 costs <- c(0.001, 0.01, 0.1, 1, 5, 10, 100)
 # c(0.1, 0.2, 0.5, 0.7, 1, 2, 3, 4)
@@ -684,7 +671,7 @@ poly.tune <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd
                               degree=degrees))
 ```
 
-```{r svm-confmatrix}
+```{r svm-confmatrix, eval=F}
 linear.cm <- table(true=test.data[, "site"],
                           pred=predict(linear.tune$best.model, newdata=test.data))
 
@@ -698,45 +685,17 @@ poly.cm <- table(true=test.data[, "site"],
                  pred=predict(poly.tune$best.model, newdata=test.data))
 ```
 
-```{r}
+```{r, eval = F}
 confusionMatrix(linear.cm)
-```
 
-```{r}
 confusionMatrix(radial.cm)
-```
 
-```{r}
 confusionMatrix(sigmoid.cm)
-```
 
-```{r}
 confusionMatrix(poly.cm)
 ```
 
-```{r classWeight-assigning}
-set.seed(315)
-total.weight <- 60+55+64+43+18
-weight.1 <- total.weight/(5*60)
-weight.2 <- total.weight/(5*55)
-weight.3 <- total.weight/(5*64)  
-weight.4 <- total.weight/(5*43)  
-weight.5 <- total.weight/(5*18)  
-
-#increase the weight of class 4 & 5 by a little bit over 0.4(chosen arbitraily)
-weight.4 <- 1.5
-weight.5 <- 3
-
-linear.weighted <- tune(svm, site~female+ male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
-                    data=train.data, kernel="linear",
-                    ranges=list(cost=costs),
-                    class.weights=c("1"=weight.1,
-                                    "2"=weight.2,
-                                    "3"=weight.3,
-                                    "4"=weight.4,
-                                    "5"=weight.5),
-                    class.type="one.versus.one")
-
+```{r, eval=F}
 radial.weighted <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform + sd_pnumb+sd_prelat+sd_pclasf+sd_peabody, 
                     data=train.data, kernel="radial",
                     ranges=list(cost=costs, 
@@ -773,11 +732,6 @@ poly.weighted <- tune(svm, site~female + male + sd_age+sd_pBod+sd_plet+sd_pform 
                                     "4"=weight.4,
                                     "5"=weight.5),
                     class.type="one.versus.one")
-```
-
-```{r}
-linear.w.cm <- table(true=test.data[, "site"],
-                          pred=predict(linear.weighted$best.model, newdata=test.data))
 
 radial.w.cm <- table(true=test.data[, "site"],
                           pred=predict(radial.weighted$best.model, newdata=test.data))
@@ -789,31 +743,11 @@ poly.w.cm <- table(true=test.data[, "site"],
                  pred=predict(poly.weighted$best.model, newdata=test.data))
 ```
 
-```{r}
-confusionMatrix(linear.w.cm)
-```
-
-```{r}
+```{r, eval=F}
 confusionMatrix(radial.w.cm)
-```
 
-```{r}
 confusionMatrix(sigmoid.w.cm)
-```
 
-```{r}
 confusionMatrix(poly.w.cm)
 ```
 
-In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the female, male, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification tree to answer this question as well; however, this model performed poorly on our data. Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is: (add formula)
-
-We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. To improve our model’s predictive power, we implemented a variety of different methods. We tested our model using linear, radial, and sigmoid kernels and compared the predictive accuracy between these models. Since we are interested in high predictive power and the radial kernel had the highest prediction accuracy, we chose this kernel.
-
-Standardizing the predictor variables in SVM and encoding categorical variables has been shown to improve performance for SVMs (https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf). Thus, we used the standardized forms of the continuous variables in our model and encoded the sex variable so that if a child was a male we would code that as 1. We did indeed observe a small improvement in prediction accuracy across all models. However, one problem that particularly piqued our interests is that we are making no predictions for sites 4 or 5. This could be due to sites 4 & 5 having a smaller number of observations than the other classes. Thus, we used the class weight formula below to assign weights to each class and specify "one versus one" comparison, which has been suggested to yield better prediction than "one versus all."
-
-$$
-w_j =\frac{n}{kn_j} , \text{ n is total number of data points, k is number of classes, }n_j \text{ is the number of data in class j}
-$$
-
-After the class weight assignment, the SVM models began to make prediction on class 4
-& 5. However, doing so came at the cost of overall accuracy. Thus, more of the other observations are being misclassified, but the few observations of class 4&5 are correctly classified. To remedy this issue, we began to experiment with the class weights and increase the class 4 & 5 weights by roughly 0.5, which is arbitrarily chosen, and it boosted linear kernel SVM's prediction accuracy to 0.403.
