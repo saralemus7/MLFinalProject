@@ -815,7 +815,7 @@ train.index <- sample(1:n, size = floor(0.7*n), replace=FALSE)
 
 # ,"prebody", "prelet","preform", "prenumb", "prerelat", "preclasf", "postbody", "postlet", "postform", #"postnumb", "postrelat", "postclasf", "peabody"
                    
-tree.features <- c("site", "age", "viewcat", "setting", "viewenc")
+tree.features <- c("site", "age", "viewcat", "setting", "viewenc", "prebody", "prelet","preform", "prenumb", "prerelat", "preclasf")
 
 tree.data <- sesame[, tree.features]
 train.data <- tree.data[train.index,]
@@ -934,7 +934,7 @@ tabs <- table(true=test.log[, "site"],
 confusionMatrix(tabs)
 
 ##forward selection
-log.tune <- train(site~(.)^2, data=train.log, method="multinom", direction="forward",
+log.tune <- train(site~(.)^2, data=train.log, method="multinom", direction="backward",
                   k=log(3562))
 
 summary(log.tune)

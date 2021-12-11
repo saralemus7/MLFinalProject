@@ -71,7 +71,9 @@ Initially, we were inclined to use least absolute shrinkage and selection operat
 
 ## Question 2
 
-In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the female, male, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification tree to answer this question as well; however, this model performed poorly on our data. Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is: (add formula)
+In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the female, male, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification Random Forest model to answer this question as well; the tree model would allow us to plot importance measures to see which feature(s) are the most 'important'. 
+
+Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is: (add formula) (Maybe present Tree as well? the tree accuracy is higher, not by much though)
 
 We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. To improve our model’s predictive power, we implemented a variety of different methods. We tested our model using linear, radial, and sigmoid kernels and compared the predictive accuracy between these models. Since we are interested in high predictive power and the radial kernel had the highest prediction accuracy, we chose this kernel.
 
@@ -83,9 +85,6 @@ $$
 
 After the class weight assignment, the SVM models began to make prediction on class 4
 & 5. However, doing so came at the cost of overall accuracy. Thus, more of the other observations are being misclassified, but the few observations of class 4&5 are correctly classified. To remedy this issue, we began to experiment with the class weights and increase the class 4 & 5 weights by roughly 0.5, which is arbitrarily chosen, and it boosted linear kernel SVM's prediction accuracy to 0.403.
-
-In addition to Support Vector Machines, we also implemented Random Forest model and a logistic regression model to compare which model has the best prediction performance. In the Random Forest model, since we typically build a random forest of classification tree using $\sqrt{p}$ features from the $p = 11$ features, we set the argument $mtry = 4$. In Logistic Regression, we first built a full model that includes the 9 features and all of their pairwise interactions. Then we performed backward selection using 
-AIC as the metric.
 
 # Results
 
@@ -106,11 +105,10 @@ classfMod.tab <- data.frame(Model = c("Linear Kernel SVM",
                                       "Radial Kernel SVM",
                                       "Sigmoid Kernel SVM",
                                       "Polynomial Kernel SVM",
-                                      "Random Forest",
-                                      "Logistic Regression"),
+                                      "Random Forest"),
                             Accuracy = c(0.4028, 0.3611, 
                                          0.2639, 0.2917, 
-                                         0.4444, 0.4307))
+                                         0.4444))
 all.accuracy <- kable(classfMod.tab, caption = "Classification Model Accuracy Table", booktabs=T)
 kable_styling(all.accuracy, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
 ```
