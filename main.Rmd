@@ -667,27 +667,15 @@ mean((yhat-y.test)^2)
 
 ```{r}
 
-# df1 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff"), Least.Regression.Test.MSE = c(32.45, 24.45, 23.19, 28.24, 23.64, 65.41), Ridge.Regression.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26 ), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
+df1 <- data.frame(Response = c("Changes in Body Parts Knolwedge Test Score", "Changes in Letters Test Score", "Changes in Form Test Score", "Changes in Forms Test Knowledge", "Changes in Relational Terms Test Score", "Changes in Classification Skills Test Score"), Least.Regression.Test.MSE = c(32.45, 24.45, 23.19, 28.24, 23.64, 65.41), Ridge.Regression.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26 ), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
 # 
-# table <- kable(df1, caption = "Test Metrics", booktabs=T)
-# kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+table <- kable(df1, caption = "Test Metrics", booktabs=T)
+kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
 
 
 ```
 
 ## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
-
-
-```{r}
-ggplot(data=sesame, aes(x=prenumb, y=prelet, color=site))+
-  geom_point()
-ggplot(data=sesame, aes(x=prenumb, y=prerelat, color=site))+
-  geom_point()
-ggplot(data=sesame, aes(x=preform, y=preclasf, color=site))+
-  geom_point()
-ggplot(data=sesame, aes(x=preclasf, y=prerelat, color=site))+
-  geom_point()
-```
 
 
 
