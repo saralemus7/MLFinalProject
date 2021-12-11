@@ -51,13 +51,15 @@ sesame.sd <- sesame%>%
 
 # Introduction
 
-## Q.1 Prediction Question: Can we use linear regression to predict the change in a child's test scores that occur after watching Sesame street (or in some instances, not watching Sesame street)?
+## Research Question #1
+
+Can we use linear regression to predict the change in a child's test scores that occur after watching Sesame street (or in some instances, not watching Sesame street)?
 
 # Methodology 
 
 ## Question 1
 
-We decided to utilize three different types of models to gain inference and predict the difference in test scores that occurs after subjects watch Sesame Street: (1) least-squares regression model (2) ridge regression model and (3) regression tree model. There are six different test scores in the data set, so we fit three models for each difference in test score variable. Each model took the following variables as covariates:``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``. Before creating these models, we factored those variables to encode them as categoricals. The least-squares and ridge regression models also took into account all possible two-way interaction terms between the variables.
+We decided to utilize three different types of models to gain inference and predict the difference in test scores that occurs after subjects watch Sesame Street: (1) least-squares regression model (2) ridge regression model and (3) regression tree model. There are six different test scores in the data set, so we fit three models for each difference in test score variable. Each model took the following variables as covariates: ``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``. Before creating these models, we factored those variables to encode them as categoricals. Initially, our least-squares and ridge regression models also took into account all possible two-way interaction terms between the variables. However, we noticed that both the Akaike Information Criterion (AIC) and adjusted-$R^2$ values were higher for models that did not include any interaction effects. That reason, coupled with the lack of apparent interaction effects in our exploratory data analysis and the fact that we wanted our linear models to be very interpretable, is why we decided not to include any interaction effects in our final linear models. 
 
 One problem that we envisioned when evaluating and comparing the different models is that the tests are scored on different scales. For example, the scores for the test on knowledge of body parts (noted by ``bodyDiff``) range from 0-32, while those of the test on letters (noted by ``letDiff``) range from 0-58. To be able to aptly compare the mean squared error (MSE) between models, we also decided to convert each response variable to the same range. More specifically, we scaled each variable to the arbitrary range [0, 30]. Lastly, we randomly split the data between testing and training, using 70% of the data for training and 30% of the data for testing.
 
@@ -69,11 +71,17 @@ Initially, we were inclined to use least absolute shrinkage and selection operat
 
 ~Talk about why we chose regression tree models~
 
+In the context of a regression tree, the deviance is simply the sum of the squared errors.
+
 # Results
+
+Linear Regression Models
+
 
 ```{r}
 
-df1 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff"), Least.Regression.Test.MSE = c(32.45, 24.45, 23.19, 28.24, 23.64, 65.41), Ridge.Regression.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26 ), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
+df1 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff"), 
+Least.Squares.Regression.Test.MSE = c(24.01, 14.31, 13.26, 15.51, 18.94, 48.40), Ridge.Regression.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
 
 table <- kable(df1, caption = "Test Metrics", booktabs=T)
 kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
@@ -126,7 +134,7 @@ testing = sesame.q1[-train, ]
 
 ```{r}
 
-lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod1.full)
 AIC(lin.mod1.full)
 
@@ -169,7 +177,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod2.full)
 AIC(lin.mod2.full)
 
@@ -212,7 +220,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod3.full)
 AIC(lin.mod3.full)
 
@@ -255,7 +263,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod4.full)
 AIC(lin.mod4.full)
 
@@ -298,7 +306,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod5.full)
 AIC(lin.mod5.full)
 
@@ -341,7 +349,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod6.full)
 AIC(lin.mod6.full)
 
@@ -383,8 +391,6 @@ mean((ridge.pred - y.test)^2)
 ```
 
 ### Regression Tree Models 
-
-In the context of a regression tree, the deviance is simply the sum of the squared errors.
 
 ## Model 1
 

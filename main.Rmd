@@ -202,7 +202,6 @@ sesame.q1$clasfDiff <- rescale(sesame.q1$clasfDiff, to = c(0, 30))
 
 ```
 
-
 ```{r}
 
 # Test-Train Split
@@ -219,7 +218,7 @@ Before creating these models, we first factored the following variables to encod
 
 ```{r}
 
-lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod1.full)
 AIC(lin.mod1.full)
 
@@ -262,7 +261,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod2.full)
 AIC(lin.mod2.full)
 
@@ -305,7 +304,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod3.full)
 AIC(lin.mod3.full)
 
@@ -348,7 +347,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod4.full)
 AIC(lin.mod4.full)
 
@@ -391,7 +390,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod5.full)
 AIC(lin.mod5.full)
 
@@ -434,7 +433,7 @@ mean((ridge.pred - y.test)^2)
 
 ```{r}
 
-lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc)^2, data = training)
+lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training)
 summary(lin.mod6.full)
 AIC(lin.mod6.full)
 
@@ -476,8 +475,6 @@ mean((ridge.pred - y.test)^2)
 ```
 
 ### Regression Tree Models 
-
-In the context of a regression tree, the deviance is simply the sum of the squared errors.
 
 ## Model 1
 
