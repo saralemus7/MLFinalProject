@@ -239,24 +239,15 @@ confusionMatrix(sigmoid.w.cm)
 confusionMatrix(poly.w.cm)
 ```
 
-In our initial SVM models, Radial Kernel SVM came with the best performance in
-terms of prediction accuracy, but it was only slightly above 0.30. We came across
-several online resources that stated standardizing the variables and encoding the
-categorical variables have empirically imrpoved SVM models performance (https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf). After we standardized
-the variables and encoded the sex variable (if a data is a male, then it has (1,0)),
-we observed a light improvement in prediction accuracy across all models. However,
-one problem that particularly piqued our interests is that no predictions on class 4
-class 5 are made before & after variable transformation. We then realized that, relatively, class 4 & 5 have less number of data than the other classes. Although
-we'd argue that the proportion not severe enough for us to deem the dataset as an imbalanced one, we used the formula below to assign weights to each class and specify
-"one versus one" comparison, which has been suggested to yield better prediction 
-than "one versus all."
+In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the female, male, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification tree to answer this question as well; however, this model performed poorly on our data. Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is: (add formula)
+
+We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. To improve our model’s predictive power, we implemented a variety of different methods. We tested our model using linear, radial, and sigmoid kernels and compared the predictive accuracy between these models. Since we are interested in high predictive power and the radial kernel had the highest prediction accuracy, we chose this kernel.
+
+Standardizing the predictor variables in SVM and encoding categorical variables has been shown to improve performance for SVMs (https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf). Thus, we used the standardized forms of the continuous variables in our model and encoded the sex variable so that if a child was a male we would code that as 1. We did indeed observe a small improvement in prediction accuracy across all models. However, one problem that particularly piqued our interests is that we are making no predictions for sites 4 or 5. This could be due to sites 4 & 5 having a smaller number of observations than the other classes. Thus, we used the class weight formula below to assign weights to each class and specify "one versus one" comparison, which has been suggested to yield better prediction than "one versus all."
 
 $$
 w_j =\frac{n}{kn_j} , \text{ n is total number of data points, k is number of classes, }n_j \text{ is the number of data in class j}
 $$
 
-After class weight assignment, the SVM models began to make prediction on class 4
-& 5, at the cost of overall accuracy that more test data are being misclassified
-even though a few number of 4&5 are correctly classified. Then, we began to experiment
-with the class weights and increase the class 4 & 5 weights by roughly 0.5, which is 
-arbitrarily chosen, and it boosted linear kernel SVM's prediction accuracy to 0.403.
+After the class weight assignment, the SVM models began to make prediction on class 4
+& 5. However, doing so came at the cost of overall accuracy. Thus, more of the other observations are being misclassified, but the few observations of class 4&5 are correctly classified. To remedy this issue, we began to experiment with the class weights and increase the class 4 & 5 weights by roughly 0.5, which is arbitrarily chosen, and it boosted linear kernel SVM's prediction accuracy to 0.403.
