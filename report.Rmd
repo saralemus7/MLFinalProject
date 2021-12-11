@@ -87,9 +87,8 @@ We tested our model using linear, radial, sigmoid, and polynomial kernels and co
 
 # Results
 
-<<<<<<< HEAD
 ## Research Question 1 
-=======
+
 Linear Regression Models
 
 $$ bodyDiff = 16.43 \ + \ 2.45 \ (site3) \ + \ 2.97 \ (site4) \ + \ 3.30 \ (site5) $$
@@ -98,8 +97,6 @@ $$ formDiff = 16.04 \ + \ 2.48 \ (viewcat4)$$
 $$ numbDiff = 15.39 \ + \ 2.56 \ (site2) \ + \ 3.20 \ (viewcat3) \ + \ 3.64 \ (viewcat4)$$
 $$ relatDiff = 18.49 \ + \ 2.42 \ (site4) \ + \ 2.96 \ (viewcat4) $$
 $$ clasfDiff = 10.95 \ + \ 4.06 \ (viewcat4) $$
-
->>>>>>> 3c393d671fdc7aedbd8b61a324d74f18010766ab
 
 ```{r}
 
@@ -474,9 +471,6 @@ set.seed(1)
 reg.tree.1 <- tree(bodyDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.1)
 
-plot(reg.tree.1)
-text(reg.tree.1, pretty = 0)
-
 cv.reg.tree.1  <- cv.tree(reg.tree.1)
 plot(cv.reg.tree.1$size, cv.reg.tree.1$dev, type = "b")
 
@@ -504,9 +498,6 @@ set.seed(1)
 
 reg.tree.2 <- tree(letDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.2)
-
-plot(reg.tree.2)
-text(reg.tree.2, pretty = 0)
 
 cv.reg.tree.2  <- cv.tree(reg.tree.2)
 plot(cv.reg.tree.2$size, cv.reg.tree.2$dev, type = "b")
@@ -536,9 +527,6 @@ set.seed(1)
 reg.tree.3 <- tree(formDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.3)
 
-plot(reg.tree.3)
-text(reg.tree.3, pretty = 0)
-
 cv.reg.tree.3  <- cv.tree(reg.tree.3)
 plot(cv.reg.tree.3$size, cv.reg.tree.3$dev, type = "b")
 
@@ -566,9 +554,6 @@ set.seed(1)
 
 reg.tree.4 <- tree(numbDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.4)
-
-plot(reg.tree.4)
-text(reg.tree.4, pretty = 0)
 
 cv.reg.tree.4  <- cv.tree(reg.tree.4)
 plot(cv.reg.tree.4$size, cv.reg.tree.4$dev, type = "b")
@@ -598,9 +583,6 @@ set.seed(1)
 reg.tree.5 <- tree(relatDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.5)
 
-plot(reg.tree.5)
-text(reg.tree.5, pretty = 0)
-
 cv.reg.tree.5  <- cv.tree(reg.tree.5)
 plot(cv.reg.tree.5$size, cv.reg.tree.5$dev, type = "b")
 
@@ -628,9 +610,6 @@ set.seed(1)
 
 reg.tree.6 <- tree(clasfDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
 summary(reg.tree.6)
-
-plot(reg.tree.6)
-text(reg.tree.6, pretty = 0)
 
 cv.reg.tree.6  <- cv.tree(reg.tree.6)
 plot(cv.reg.tree.6$size, cv.reg.tree.6$dev, type = "b")
