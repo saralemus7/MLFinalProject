@@ -64,32 +64,7 @@ We first decided to use least-squares regression models due to the fact that the
 
 We tuned our $\lambda$ parameter using 10-fold cross validation. More specifically, we computed the cross-validation error rate for our model for a grid of $\lambda$ values. Thereafter, we selected the $\lambda$ value for which the cross-validation error is the smallest. 
 
-Initially, we were inclined to use least absolute shrinkage and selection operator (LASSO) regression. The main advantage of LASSO regression over ridge regression is that LASSO regression performs variable selection by setting the slope coefficients of inert predictors to 0. The reason why we initially thought that LASSO regression would work better than ridge regression is that in most of our linear models, only a small subset of variables are significant at a 95% significance level.  However, our ridge regression models performed marginally better than our LASSO regression models, so for this reason, we decided to report the MSE’s for the ridge regression models. 
-
-~Talk about why we chose regression tree models~
-
-In the context of a regression tree, the deviance is simply the sum of the squared errors.
-
-## Research Question 2
-In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification tree and a logistic model to answer this question as well; however, these models did not perform as well on our data (See Appendix for more details). Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is:
-$$
-svm(site \mathtt{\sim} female + male + age + bodyparts_{pretest}+ letters_{pretest} + 
-\\ forms_{pretest} +numbers_{pretest} + relationalterms_{pretest} + classificationskills_{pretest} )
-$$
-
-We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. Since we are interested in high predictive power, we implemented a variety of different methods. Standardizing the predictor variables in SVM and encoding categorical variables has been shown to improve performance for SVMs [1]. Thus, we used the standardized forms of the continuous variables in our model and encoded the female and male variables. We did indeed observe a small improvement in prediction accuracy across all models. However, one problem that particularly piqued our interests is that we are making no predictions for classes 4 or 5 for site. This could be due to sites 4 & 5 having a smaller number of observations than the other classes. Thus, we used the class weight formula below to assign weights to each class and specify "one versus one" comparison, which has been suggested to yield better prediction than "one versus all" [2].
-
-$$
-w_j =\frac{n}{kn_j} , \text{ n is total number of data points, k is number of classes, }n_j \text{ is the number of data in class j}
-$$
-
-We tested our model using linear, radial, sigmoid, and polynomial kernels and compared the predictive accuracy between these models. After the class weight assignment, the SVM models began to make prediction on class 4&5. However, doing so came at the cost of overall accuracy. Thus, more of the other observations are being misclassified, but the few observations of sites 4&5 are correctly classified. To remedy this issue, we began to experiment with the class weights and increase the sites 4&5 weights by roughly 0.5 until we reached the highest predictive power. The model with the highest accuracy was the linear kernel SVM with weights 0.8 on site 1, 0.87 on site 2, 0.75 on site 3, 1.5 on site 4, and 3 on site 5 and a cross validation selected cost parameter of 0.1. Since this model has the highest predictive accuracy of all others that we had tried, we settled on this model as our final model. There are no explicit tests for SVM model diagnostics; however, there seems to be no major issue with our model fit.
-
-# Results
-
-## Research Question 1 
-
-Linear Regression Models
+Initially, we were inclined to use least absolute shrinkage and selection operator (LASSO) regression. The main advantage of LASSO regression over ridge regression is that LASSO regression performs variable selection by setting the slope coefficients of inert predictors to 0. The reason why we initially thought that LASSO regression would work better than ridge regression is that in most of our linear models, only a small subset of variables are significant at a 95% significance level.  However, our ridge regression models performed marginally better than our LASSO regression models, so for this reason, we decided to report the MSE’s for the ridge regression models. The final ridge regression model outputs are:
 
 $$ bodyDiff = 16.43 \ + \ 2.45 \ (site3) \ + \ 2.97 \ (site4) \ + \ 3.30 \ (site5) $$
 $$ letDiff = 10.52 \ + \ 3.09 \ (site2) \ - \ 2.86 \ (site3) \ + 4.85 \ (viewcat3) \ + 4.77 \ (viewcat4) $$
@@ -97,6 +72,27 @@ $$ formDiff = 16.04 \ + \ 2.48 \ (viewcat4)$$
 $$ numbDiff = 15.39 \ + \ 2.56 \ (site2) \ + \ 3.20 \ (viewcat3) \ + \ 3.64 \ (viewcat4)$$
 $$ relatDiff = 18.49 \ + \ 2.42 \ (site4) \ + \ 2.96 \ (viewcat4) $$
 $$ clasfDiff = 10.95 \ + \ 4.06 \ (viewcat4) $$
+
+~Talk about why we chose regression tree models~
+
+In the context of a regression tree, the deviance is simply the sum of the squared errors.
+
+## Research Question 2
+In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification tree and a logistic model to answer this question as well; however, these models did not perform as well on our data (See Appendix for more details). Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is:
+$$svm(site \mathtt{\sim} female + male + age + bodyparts_{pretest}+ letters_{pretest} + 
+\\ forms_{pretest} +numbers_{pretest} + relationalterms_{pretest} + classificationskills_{pretest} )$$
+
+We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. Since we are interested in high predictive power, we implemented a variety of different methods. Standardizing the predictor variables in SVM and encoding categorical variables has been shown to improve performance for SVMs [1]. Thus, we used the standardized forms of the continuous variables in our model and encoded the female and male variables. We did indeed observe a small improvement in prediction accuracy across all models. However, one problem that particularly piqued our interests is that we are making no predictions for classes 4 or 5 for site. This could be due to sites 4 & 5 having a smaller number of observations than the other classes. We first tried using the Synthetic Minority Over-Sampling Technique (SMOTE) to increase observations within these classes; however, this technique had negligible effects on our accuracy. We then tried weighting the classes and used the formula below to assign weights to each class and specify "one versus one" comparison, which has been suggested to yield better prediction than "one versus all" [2].
+
+$$
+w_j =\frac{n}{kn_j} , \text{ n is total number of data points, k is number of classes, }n_j \text{ is the number of data in class j}
+$$
+
+We tested our model using linear, radial, sigmoid, and polynomial kernels and compared the predictive accuracy between these models. After the class weight assignment, the SVM models began to make prediction on class 4&5. However, doing so came at the cost of overall accuracy. Thus, more of the other observations are being misclassified, but the few observations of sites 4&5 are correctly classified. To remedy this issue, we began to experiment with the class weights and increase the sites 4&5 weights by roughly 0.5 until we reached the highest predictive power. The model with the highest accuracy was the linear kernel SVM with weights 0.8 on site 1, 0.87 on site 2, 0.75 on site 3, 1.5 on site 4, and 3 on site 5 and a cross validation selected cost parameter of 0.1. Since this model has the highest predictive accuracy of all others that we had tried, we settled on this model as our final model. There are no explicit tests for SVM model diagnostics; however, there seems to be no major issues with our model fit.
+
+# Results
+
+## Research Question 1
 
 ```{r}
 
@@ -198,7 +194,7 @@ kable_styling(table.svm.cm, bootstrap_options = "striped", full_width = F, latex
 
 [2] One-vs-Rest and One-vs-One for Mutli-Class Classification. (2020). Machine Learning Mastery. https://machinelearningmastery.com/one-vs-rest-and-one-vs-one-for-multi-class-classification/
 
-## Models
+## Research Question 1: Linear Models
 ```{r factor-categoricals}
 sesame.q1 <- sesame
 
@@ -461,7 +457,7 @@ ridge.pred <- predict(ridge.mod6.full, s = best.lam, newx = x.test)
 mean((ridge.pred - y.test)^2)
 ```
 
-## Regression Tree Models 
+## Research Question 1: Regression Tree Models 
 
 ### Model 1
 
@@ -631,9 +627,7 @@ mean((yhat-y.test)^2)
 ```
 
 
-## Q.2 Classification Question: Can we use the pre-test scores and other demographic variables to predict which region the children came from?
-
-### Extra SVM models
+## Research Question 2: Extra SVM models
 
 ```{r svm-fitting-without-classWeight, eval= F}
 set.seed(315)
