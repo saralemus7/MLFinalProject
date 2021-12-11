@@ -69,6 +69,24 @@ Initially, we were inclined to use least absolute shrinkage and selection operat
 
 ~Talk about why we chose regression tree models~
 
+## Question 2
+
+In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the female, male, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification tree to answer this question as well; however, this model performed poorly on our data. Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is: (add formula)
+
+We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. To improve our model’s predictive power, we implemented a variety of different methods. We tested our model using linear, radial, and sigmoid kernels and compared the predictive accuracy between these models. Since we are interested in high predictive power and the radial kernel had the highest prediction accuracy, we chose this kernel.
+
+Standardizing the predictor variables in SVM and encoding categorical variables has been shown to improve performance for SVMs (https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf). Thus, we used the standardized forms of the continuous variables in our model and encoded the sex variable so that if a child was a male we would code that as 1. We did indeed observe a small improvement in prediction accuracy across all models. However, one problem that particularly piqued our interests is that we are making no predictions for sites 4 or 5. This could be due to sites 4 & 5 having a smaller number of observations than the other classes. Thus, we used the class weight formula below to assign weights to each class and specify "one versus one" comparison, which has been suggested to yield better prediction than "one versus all."
+
+$$
+w_j =\frac{n}{kn_j} , \text{ n is total number of data points, k is number of classes, }n_j \text{ is the number of data in class j}
+$$
+
+After the class weight assignment, the SVM models began to make prediction on class 4
+& 5. However, doing so came at the cost of overall accuracy. Thus, more of the other observations are being misclassified, but the few observations of class 4&5 are correctly classified. To remedy this issue, we began to experiment with the class weights and increase the class 4 & 5 weights by roughly 0.5, which is arbitrarily chosen, and it boosted linear kernel SVM's prediction accuracy to 0.403.
+
+In addition to Support Vector Machines, we also implemented Random Forest model and a logistic regression model to compare which model has the best prediction performance. In the Random Forest model, since we typically build a random forest of classification tree using $\sqrt{p}$ features from the $p = 11$ features, we set the argument $mtry = 4$. In Logistic Regression, we first built a full model that includes the 9 features and all of their pairwise interactions. Then we performed backward selection using 
+AIC as the metric.
+
 # Results
 
 ```{r}
@@ -82,6 +100,34 @@ kable_styling(table, bootstrap_options = "striped", full_width = F, latex_option
 ```
 
 From the results of the above table, one can see that the ridge regression models have the best performance, although the performance of the regression trees are very similar . For each response variable except ``bodyDiff``, the ridge regression model reports the lowest test MSE, although the difference in performance between the ridge regression and the regression tree is very marginal. 
+
+```{r classMod-accuracy-tab}
+classfMod.tab <- data.frame(Model = c("Linear Kernel SVM",
+                                      "Radial Kernel SVM",
+                                      "Sigmoid Kernel SVM",
+                                      "Polynomial Kernel SVM",
+                                      "Random Forest",
+                                      "Logistic Regression"),
+                            Accuracy = c(0.4028, 0.3611, 
+                                         0.2639, 0.2917, 
+                                         0.4444, 0.4307))
+all.accuracy <- kable(classfMod.tab, caption = "Classification Model Accuracy Table", booktabs=T)
+kable_styling(all.accuracy, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+```
+
+```{r echo=FALSE, results='hide'}
+
+svmTab <- data.frame(Truth = c("Class 1", "Class 2", "Class 3", "Class 4", "Class 5"), 
+                     Class1.Prediction = c(6,1,0,3,0), 
+                     Class2.Prediction = c(1,7,1,3,1),
+                     class3.Prediction = c(6,1,11,9,1),
+                     class4.Prediction = c(2,1,1,3,1),
+                     class5.Prediction = c(5,3,3,0,2))
+ 
+table.svm.cm <- kable(svmTab, caption = "Linear Kernel SVM (Class reweighted) Confusion Matrix", booktabs=T)
+kable_styling(table.svm.cm, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+```
+
 
 # Conclusion 
 
@@ -180,6 +226,7 @@ y.test <- testing[, "letDiff"]
 mean((yhat-y.test)^2)
 
 ```
+
 
 ```{r}
 
