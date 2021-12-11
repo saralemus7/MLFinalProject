@@ -95,6 +95,13 @@ After the class weight assignment, the SVM models began to make prediction on cl
 
 Linear Regression Models
 
+$$ bodyDiff = 16.43 \ + \ 2.45 \ (site3) \ + \ 2.97 \ (site4) \ + \ 3.30 \ (site5) $$
+$$ letDiff = 10.52 \ + \ 3.09 \ (site2) \ - \ 2.86 \ (site3) \ + 4.85 \ (viewcat3) \ + 4.77 \ (viewcat4) $$
+$$ formDiff = 16.04 \ + \ 2.48 \ (viewcat4)$$
+$$ numbDiff = 15.39 \ + \ 2.56 \ (site2) \ + \ 3.20 \ (viewcat3) \ + \ 3.64 \ (viewcat4)$$
+$$ relatDiff = 18.49 \ + \ 2.42 \ (site4) \ + \ 2.96 \ (viewcat4) $$
+$$ clasfDiff = 10.95 \ + \ 4.06 \ (viewcat4) $$
+
 
 ```{r}
 
