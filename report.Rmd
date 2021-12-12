@@ -56,7 +56,7 @@ sesame.sd <- sesame%>%
 
 ## Research Question 1
 
-We decided to utilize three different types of models to gain inference and predict the difference in test scores that occurs after subjects watch Sesame Street: (1) least-squares regression model (2) ridge regression model and (3) regression tree model. There are six different test scores in the data set, so we fit three models for each difference in test score variable. Each model took the following variables as covariates: ``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``. Before creating these models, we factored those variables to encode them as categoricals. Initially, our least-squares and ridge regression models also took into account all possible two-way interaction terms between the variables. However, we noticed that both the Akaike Information Criterion (AIC) and adjusted-$R^2$ values were higher for models that did not include any interaction effects. That reason, coupled with the lack of apparent interaction effects in our exploratory data analysis and the fact that we wanted our linear models to be very interpretable, is why we decided not to include any interaction effects in our final linear models. 
+We decided to utilize three different types of models to gain inference and predict the difference in test scores that occurs after subjects watch Sesame Street: (1) least-squares regression model (2) ridge regression model and (3) regression tree model. There are six different test scores in the data set, so we fit three models for each difference in test score variable. Each model took the following variables as covariates: ``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``. Before creating these models, we factored those variables to encode them as categorical. Initially, our least-squares and ridge regression models also took into account all possible two-way interaction terms between the variables. However, we noticed that both the Akaike Information Criterion (AIC) and adjusted-$R^2$ values were higher for models that did not include any interaction effects. That reason, coupled with the lack of apparent interaction effects in our exploratory data analysis and the fact that we wanted our linear models to be very interpretable, is why we decided not to include any interaction effects in our final linear models. 
 
 One problem that we envisioned when evaluating and comparing the different models is that the tests are scored on different scales. For example, the scores for the test on knowledge of body parts (noted by ``bodyDiff``) range from 0-32, while those of the test on letters (noted by ``letDiff``) range from 0-58. To be able to aptly compare the mean squared error (MSE) between models, we also decided to convert each response variable to the same range. More specifically, we scaled each variable to the arbitrary range [0, 30]. Lastly, we randomly split the data between testing and training, using 70% of the data for training and 30% of the data for testing.
 
@@ -161,7 +161,7 @@ linear.w.cm <- table(true=test.data[, "site"],
 confusionMatrix(linear.w.cm)
 ```
 
-As evidenced in the table below, the class weighted linear kernel SVM has a prediction accuracy of 0.403 on our test data with a confidence interval of 0.289 to 0.525. From the confusion matrix, we can also see that our model predicts well for classes 2 and 3 and struggles slightly with clases 1,4, and 5. Specifically, our model has tends to predict class 3 often when the true class is 4, and it tends to predict classes 3 and 5 as commonly as class 1 when the true class is 1.
+As evidenced in the table below, the class weighted linear kernel SVM has a prediction accuracy of 0.403 on our test data with a confidence interval of 0.289 to 0.525. From the confusion matrix, we can also see that our model predicts well for classes 2 and 3 and struggles slightly with classes 1,4, and 5. Specifically, our model has tends to predict class 3 often when the true class is 4, and it tends to predict classes 3 and 5 as commonly as class 1 when the true class is 1.
 
 ```{r}
 ressvm <- data.frame(Results = c("Accuracy", "95% CI"),
@@ -187,12 +187,17 @@ kable_styling(table.svm.cm, bootstrap_options = "striped", full_width = F, latex
 
 # Conclusion 
 
+## Research Question 2
+Our goal for this research question was to build a model that could accurately predict the background that a child came from based on their age, sex, and pretest scores. While our model does not perform very poorly on our data, there is still room for improvement. As mentioned in the Results section, the accuracy is .403, and this is the highest accuracy of all the models we tried. This could be a flaw of the data as we have only 240 observations which is not very many. Additionally, there is some imbalance in our data set as we have less observations of children from sites 4 and 5, disadvantaged rural children and disadvantaged Spanish speaking children respectively. This may be a flaw of the data collection, and our data may not be representative of the general population. Additionally, there may have existed a clustering structure that caused the SVM model to struggle with separating the different levels of site. This phenomenon may be illustrated with the confusion matrix having some difficulty separating between certain classes. When the true site is 3, indicating an advantaged child from the inner city, the model tends to predict site 4 as well which represents an advantaged rural child. The differences between these backgrounds may be quite small, so the model does not distinguish them quite well. We may be able to improve our model and gain greater predictive accuracy with more children in our data set and more data. Including more variables into our data set, such as child attendance in preschool or daycare, may also be useful for prediction and answering this research question. 
+
+Another possible inference from these results is that pretest scores may not be predictive of background. Thus, whether a child is considered advantaged/disadvantaged or rural/suburban may not influence their pretest scores greatly. Perhaps, the difference in pretest scores between these different categories of children is not significantly different at a very young age. There also may be more factors that explain pretest scores. For example, socioeconomic status or parent education, may be a more useful response variable than a arbitrary determination of advantaged or disadvantaged. Future work may be focused on collecting information on these socioeconomic variables and performing analysis once again to see if our results differ.
+
 # Appendix
 
 ## References
 [1] A Practical Guide to Support Vector Machines. (2003). National Taiwan University. https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
 
-[2] One-vs-Rest and One-vs-One for Mutli-Class Classification. (2020). Machine Learning Mastery. https://machinelearningmastery.com/one-vs-rest-and-one-vs-one-for-multi-class-classification/
+[2] One-vs-Rest and One-vs-One for Multi-Class Classification. (2020). Machine Learning Mastery. https://machinelearningmastery.com/one-vs-rest-and-one-vs-one-for-multi-class-classification/
 
 ## Research Question 1: Linear Models
 ```{r factor-categoricals}
