@@ -52,6 +52,7 @@ sesame.sd <- sesame%>%
          female=if_else(sex==2, 1, 0))
 ```
 
+
 # Introduction
 
 Sesame Street is a hallmark feature of American television that has been educating young children since 1969. The publicly-funded show was created with the goal of supplementing the learning of low-income preschoolers who did not have the access to early education that their other peers did. However, Sesame Street has had far-reaching success across all segments of the American population, regardless of background. In fact, according to one 1996 survey,  95% of all American children had watched Sesame Street by the time they turned 3. A more recent 2018 estimate suggested that about 86 million Americans had watched the show as young children. Such an impactful TV series that has influenced the childhoods of countless Americans warrants further investigation into the educational impacts of the progam itself. 
@@ -66,6 +67,53 @@ The first question directly examines the relationship between Sesame Street and 
 The second question investigates the relationship between various subject pre-test scores and children of different income and living situations. By understanding this, we can develop a more more nuanced understanding of how low income children may be affected by their background. The lack of education for low-income students in America has been a problem for decades, and still persists today. One statistics suggests that a mere 18% of low-income students are enrolled in high-quality pre-K. Location also plays a role: 55% of children who live in rural areas lack access to high-quality education as well. The lack of access to pre-K disproportionately affects students from disadvantaged backgrounds, as they are left less ready for kindergarten and may suffer further disadvantages from their peers as they continue their education into elementary, middle, and high school. Thus, it is critical to further understand the relationship between the background of children and how this affects their ability to learn critical subjects like learning and math. 
 
 We address our research questions using various machine modeling techniques. More specifically, we will use ____ an SVM to classify the background that the child is from.
+
+
+# Data
+
+Our data contains 34 variables. The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The viewcat column is the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The setting is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The viewenc column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). Encour is the same variable but with values 0 and 1, respectively. Regular is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). 
+
+The prebody, prelet, preform, prenumb, prerelat, and preclasf columns all decribe pretest scores on varying types of assessments (body parts, letters, forms, numbers, relational terms, and classification skills, respectively). The columns labeled postbody, postlet, postform, postnumb, postrelat, and postclasf are the children's respective posttest scores. We created the following variables - bodydiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff - to represent the difference in posttest scores and pretest scores for each child. Lastly, peabody represents a score of "mental age" for vocabulary maturity from the Peabody Picture Vocabulary Test.
+
+Our main focus will be on the new variables we created (bodyDiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff) and variables related to how often the children watch Sesame Street (namely, viewcat and regular). Lastly, we will look into the backgrounds of the children, including site, sex, and age.
+
+```{r}
+bodyDiffplot <- ggplot(sesame, aes(x = bodyDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of bodyDiff", x = "Post - Pre on Body Parts", y = "Count") +
+  theme_minimal()
+
+numbDiffplot <- ggplot(sesame, aes(x = numbDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of numbDiff", x = "Post - Pre on Numbers", y = "Count") +
+  theme_minimal()
+
+viewcatplot <- ggplot(sesame, aes(x = factor(viewcat))) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Distribution of Viewcat", x = "Frequency of viewing Sesame", y = "Count") +
+  scale_x_discrete("Frequency of Viewing Sesame", labels=c("rarely", "1-2 pw", "3-5 pw", ">5 pw")) +
+  theme_minimal() +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
+
+siteplot <- ggplot(sesame, aes(x = factor(site))) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Distribution of Site", y = "Count") +
+  scale_x_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 50, hjust=1)) +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
+
+ageplot <- ggplot(sesame, aes(x = age)) +
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of Age", x = "Age in Months", y = "Count") +
+  theme_minimal()
+
+(bodyDiffplot + numbDiffplot + ageplot) / (viewcatplot + siteplot + ageplot)
+
+```
+
+For the purposes of our analysis, we first examined the distributions of all variables. Shown above are our plots of a few important variables, including bodyDiff, numbDiff, Viewcat, Site, and Age. All of these variables appear to be relatively normal and unimodal, raising no concerns for neccessary transformations.
 
 
 # Methodology 
