@@ -954,8 +954,6 @@ kable_styling(all.accuracy, bootstrap_options = "striped", full_width = F, latex
 
 
 ## Random Forest
-
-
 ```{r selecting-features-trees}
 
 set.seed(3215)
@@ -980,7 +978,7 @@ rf.tree<- randomForest(site~., data=tree.data, subset=train.index,
 
 importance(rf.tree)
 
-rf.pred <- predict(rf.tree, newdata=test.data)
+rf.pred <- predict(rf.tree, newdata=test.tree)
 
 tree.conMatrix <- table(true=test.data[,"site"],
                          pred=rf.pred)
