@@ -51,6 +51,19 @@ sesame.sd <- sesame%>%
 
 # Introduction
 
+Sesame Street is a hallmark feature of American television that has been educating young children since 1969. The publicly-funded show was created with the goal of supplementing the learning of low-income preschoolers who did not have the access to early education that their other peers did. However, Sesame Street has had far-reaching success across all segments of the American population, regardless of background. In fact, according to one 1996 survey,  95% of all American children had watched Sesame Street by the time they turned 3. A more recent 2018 estimate suggested that about 86 million Americans had watched the show as young children. Such an impactful TV series that has influenced the childhoods of countless Americans warrants further investigation into the educational impacts of the progam itself. 
+
+This project in particular makes use of a dataset that was compiled by researchers in the early 1970s meant to assess whether or not Sesame Street was achieving its goals of educating economically disadvantaged children. The researchers tested a variety of children from different backgrounds on critical skills like numbers and letters. They then re-tested these children after they had watched Sesame Street. Through our research, we seek to answer two questions related to this dataset about childhood education:
+
+1. Can we predict the change between pre-test and post-test scores after children watch Sesame Street?
+2. Can we use information about the pre-test score and other demographic variables to predict what type of background the child is from?
+
+The first question directly examines the relationship between Sesame Street and the knowledge of children who watch the program. Through this research goal, we hope to further understand the educational impact of the show on children of all backgrounds.
+
+The second question investigates the relationship between various subject pre-test scores and children of different income and living situations. By understanding this, we can develop a more more nuanced understanding of how low income children may be affected by their background. The lack of education for low-income students in America has been a problem for decades, and still persists today. One statistics suggests that a mere 18% of low-income students are enrolled in high-quality pre-K. Location also plays a role: 55% of children who live in rural areas lack access to high-quality education as well. The lack of access to pre-K disproportionately affects students from disadvantaged backgrounds, as they are left less ready for kindergarten and may suffer further disadvantages from their peers as they continue their education into elementary, middle, and high school. Thus, it is critical to further understand the relationship between the background of children and how this affects their ability to learn critical subjects like learning and math. 
+
+We address our research questions using various machine modeling techniques. More specifically, we will use ____ an SVMS to classify the background that the child is from.
+
 
 # Methodology 
 
