@@ -97,7 +97,7 @@ The process of building the trees was very simple. After initially building the 
 
 ## Research Question 2
 In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question and it has a few different
-kernels that can place complex decision boundaries. We also implemented a classification tree and a logistic model to answer this question as well (See Appendix for more details). However, we decide to present the SVM model as our final model choice because the three have relatively similar performance in terms of overall prediction accuracy and we have spent a considerable amount of time researching different optimization methods to boost its performance, which is one of the big takeaways we have acquired from this project. Our full model formula is:
+kernels that can place complex decision boundaries. We also implemented a classification tree and a logistic model to answer this question as well (See Appendix for more details). The three models have relatively similar performance in terms of overall prediction accuracy. However, we decided to present the SVM model as our final model since we have spent a considerable amount of time researching different optimization methods to boost its performance. Our full model formula is:
 $$SVM(site \mathtt{\sim} female + male + age + bodyparts_{pretest}+ letters_{pretest} + $$
 $$forms_{pretest} +numbers_{pretest} + relationalterms_{pretest} + classificationskills_{pretest} )$$
 
@@ -137,11 +137,12 @@ kable_styling(table, bootstrap_options = "striped", full_width = F, latex_option
 
 Linear Regression Models
 
-Looking at the least-squares linear models, we can note a few important features regarding predicting whether a child’s test scores will increase. For ``bodydiff``, or the difference between post and pre-tests scores for the recognition of body parts, we see that the intercept is 16.43, meaning the baseline difference between post score and prescore is positive. This means that the post test results are higher, however, as noted by the other predictors, this difference between post and pre gets larger as the site increases. We see if a child is ``site3``, or an advantaged rural child, the difference between their scores goes up by 2.45. For a disadvantaged rural child, the difference increases even more by 2.97 and for a disadvantaged Spanish speaking child, the difference goes up by 3.30. This indicates that for children from more disadvantaged backgrounds, the difference between the scores increases as compared to the two other sites.
+Looking at the least-squares linear models, we can note a few important features regarding predicting whether a child’s test scores will increase. For ``bodydiff``, or the difference between post and pre-tests scores for the recognition of body parts, we see that the intercept is 16.43, meaning that the post test results are higher. However, as noted by the other predictors, this difference between post and pre gets larger as the site increases holding all else constant. We see if a child is ``site3``, or an advantaged rural child, the difference between their scores goes up by 2.45 . For a disadvantaged rural child, the difference increases even more by 2.97 and for a disadvantaged Spanish speaking child, the difference goes up by 3.30. This indicates that for children from more disadvantaged backgrounds, the difference between the scores increases as compared to the two other sites.
 
-For differences in letter recognition scores, we note the intercept is 10.52, the baseline difference. We see for 4 year old advantaged children from the suburbs (``site2``) this difference increases by 3.09. However, interestingly enough for an advantaged rural child (``site3``), the difference in test scores decreases by 2.86. It also seems that the frequency of watching Sesame Street has an effect on letter scores with viewcat3 or watching 3-5 times a week increasing the difference by 4.85 and watching more than 5 times a week increasing the difference by 4.77. 
+For differences in letter recognition scores, we note the intercept is 10.52, the baseline difference. Again, holding all else constant, we see for 4 year old advantaged children from the suburbs (``site2``) this difference increases by 3.09. However, interestingly enough for an advantaged rural child (``site3``), the difference in test scores decreases by 2.86. It also seems that the frequency of watching Sesame Street has an effect on letter scores with viewcat3 or watching 3-5 times a week increasing the difference by 4.85 and watching more than 5 times a week increasing the difference by 4.77. 
 
 For recognizing forms, the intercept is 16.04 and it seems that watching Sesame Street more than 5 times a week (``viewcat4``) , further increases this difference by 2.48. For numbers, the intercept is 15.39. We note that  for an 4 year old advantaged child from the suburbs, the difference in number scores increases by 2.56. Watching Sesame Street 3-5 times a week (``viewcat3``) increases the difference by 3.20, and watching more than 5 times a week increases the difference by 3.64.  For difference in relational term scores, the intercept is 18.49, the largest of all intercepts and the difference is further increased for a disadvantaged Spanish speaking child by 2.42. For those who watch more than 5 times a week, the difference increases by 2.96. For classification score differences, the intercept is 10.95. The only variable that increases this difference is the frequency of viewing, with those that watch Sesame Street more than 5 times a week increasing the difference by 4.06.
+
 In summary, we note that the variables that affect the difference in post and pre test scores from these linear regression models are mainly from site (demographic/background) and viewcat (frequency of viewing). It makes sense that kids who watched more Sesame street, especially those that watched more than 1-2 times a week had larger differences between their pre and post test scores.We also see that in general, the post scores are higher than the pre test scores especially for body parts, relational terms, and forms as their intercept values were the highest.
 
 
@@ -224,6 +225,8 @@ Overall, this tree demonstrates that children who watch Sesame Street more frequ
 
 ## Research Question 2
 
+As evidenced in the tables below, the linear kernel SVM has a higher accuracy than the other kernels we also tried out. The class weighted linear kernel SVM has a prediction accuracy of 0.403 on our test data with a confidence interval of 0.289 to 0.525. From the confusion matrix, we can also see that our model predicts well for classes 2 and 3 and struggles slightly with classes 1,4, and 5. Specifically, our model has tends to predict class 3 often when the true class is 4, and it tends to predict classes 3 and 5 as commonly as class 1 when the true class is 1.
+
 ```{r classMod-accuracy-tab}
 classfMod.tab <- data.frame(Model = c("Linear Kernel SVM",
                                       "Radial Kernel SVM",
@@ -276,8 +279,6 @@ linear.w.cm <- table(true=test.data[, "site"],
 confusionMatrix(linear.w.cm)
 ```
 
-As evidenced in the table below, the class weighted linear kernel SVM has a prediction accuracy of 0.403 on our test data with a confidence interval of 0.289 to 0.525. From the confusion matrix, we can also see that our model predicts well for classes 2 and 3 and struggles slightly with classes 1,4, and 5. Specifically, our model has tends to predict class 3 often when the true class is 4, and it tends to predict classes 3 and 5 as commonly as class 1 when the true class is 1.
-
 ```{r}
 ressvm <- data.frame(Results = c("Accuracy", "95% CI"),
                      Values = c("0.403", "(0.289, 0.525)"))
@@ -318,7 +319,7 @@ Given that the test scores were scaled to the interval [0, 30], the intercept va
 ## Research Question 2
 Our goal for this research question was to build a model that could accurately predict the background that a child came from based on their age, sex, and pretest scores. While our model does not perform very poorly on our data, there is still room for improvement. As mentioned in the Results section, the accuracy is .403, and this is among the highest accuracies values of all the models we tried. This could be a flaw of the data as we have only 240 observations which is not very many. Additionally, there is some imbalance in our data set as we have less observations of children from sites 4 and 5, disadvantaged rural children and disadvantaged Spanish speaking children respectively. This may be a flaw of the data collection, and our data may not be representative of the general population. Additionally, there may have existed a clustering structure that caused the SVM model to struggle with separating the different levels of site. This phenomenon may be illustrated with the confusion matrix having some difficulty separating between certain classes. When the true site is 3, indicating an advantaged child from the inner city, the model tends to predict site 4 as well which represents an advantaged rural child. The differences between these backgrounds may be quite small, so the model does not distinguish them quite well. We may be able to improve our model and gain greater predictive accuracy with more children in our data set and more data. Including more variables into our data set, such as child attendance in preschool or daycare, may also be useful for prediction and answering this research question. 
 
-Another possible inference from these results is that pretest scores may not be predictive of background. Thus, whether a child is considered advantaged/disadvantaged or rural/suburban may not influence their pretest scores greatly. Perhaps, the difference in pretest scores between these different categories of children is not significantly different at a very young age. There also may be more factors that explain pretest scores. For example, socioeconomic status or parent education, may be a more useful response variable than a arbitrary determination of advantaged or disadvantaged. Future work may be focused on collecting information on these socioeconomic variables and performing analysis once again to see if our results differ. Additionally, there are also other optimization methods that we haven't explored. For example, one can try other feature transformation to make the data more separbale or try to design a customized SVM kernel that is better tailored to the distribution of data for this dataset.
+Another possible inference from these results is that pretest scores may not be predictive of background. Thus, whether a child is considered advantaged/disadvantaged or rural/suburban may not influence their pretest scores greatly. There also may be more factors that explain pretest scores. For example, socioeconomic status or parent education, may be a more useful response variable than a arbitrary determination of advantaged or disadvantaged. Future work may be focused on collecting information on these socioeconomic variables and performing analysis once again to see if our results differ. Additionally, there are also other optimization methods that we haven't explored. For example, one can try other feature transformation to make the data more separbale or try to design a customized SVM kernel that is better tailored to the distribution of data for this dataset.
 \newpage
 
 # Appendix
@@ -358,30 +359,31 @@ training = sesame.q1[train,]
 testing =sesame.q1[-train, ]
 ```
 
+### Least Squares Model for Difference in Body Part Test Scores and Diagnostics
 ```{r}
 lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
 summary(lin.mod1.full)
-AIC(lin.mod1.full)
+#AIC(lin.mod1.full)
 
 yhat <- predict(lin.mod1.full, newdata = testing)
 y.test <- testing[, "bodyDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 ```
 
 ```{r}
-
 # residual plot
+par(mfrow = c(2,2))
 res <- resid(lin.mod1.full)
-plot(fitted(lin.mod1.full), res)
+plot(fitted(lin.mod1.full), res, main = "Residual Plot")
 abline(0,0)
 
 # QQ plot
 plot_qq(lin.mod1.full)
-
 ```
 
+### Ridge Regression Model for Difference in Body Part Test Scores 
 ```{r}
 # Split data between x and y
 x.train <- model.matrix(bodyDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
@@ -404,35 +406,37 @@ ridge.mod1.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod1.full, s = best.lam, newx = x.test)
+predict(ridge.mod1.full, type = 'coefficients', s = best.lam)[1:12,]
 
 # MSE calculation
-mean((ridge.pred - y.test)^2)
+#mean((ridge.pred - y.test)^2)
 ```
 
+### Least Squares Model for Difference in Letters Test Scores and Diagnostics
 ```{r}
 lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
 summary(lin.mod2.full)
-AIC(lin.mod2.full)
+#AIC(lin.mod2.full)
 
 yhat <- predict(lin.mod2.full, newdata = testing)
 y.test <- testing[, "letDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 ```
 
 ```{r}
-
+par(mfrow=c(2,2))
 # residual plot
 res <- resid(lin.mod2.full)
-plot(fitted(lin.mod2.full), res)
+plot(fitted(lin.mod2.full), res, main = "Residual Plot")
 abline(0,0)
 
 # QQ plot
 plot_qq(lin.mod2.full)
-
 ```
 
+### Ridge Regression Model for Difference in Letters Test Scores
 ```{r}
 # Split data between x and y
 x.train <- model.matrix(letDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
@@ -455,34 +459,36 @@ ridge.mod2.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod2.full, s = best.lam, newx = x.test)
+predict(ridge.mod2.full, type = 'coefficients', s = best.lam)[1:12,]
 
 # MSE calculation
-mean((ridge.pred - y.test)^2)
+#mean((ridge.pred - y.test)^2)
 ```
 
+### Least Squares Model for Difference in Forms Test Scores and Diagnostics
 ```{r}
 lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
 summary(lin.mod3.full)
-AIC(lin.mod3.full)
+#AIC(lin.mod3.full)
 
 yhat <- predict(lin.mod3.full, newdata = testing)
 y.test <- testing[, "formDiff"]
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 ```
 
 ```{r}
-
+par(mfrow=c(2,2))
 # residual plot
 res <- resid(lin.mod3.full)
-plot(fitted(lin.mod3.full), res)
+plot(fitted(lin.mod3.full), res, main = "Residual Plot")
 abline(0,0)
 
 # QQ plot
 plot_qq(lin.mod3.full)
-
 ```
 
+### Ridge Regression Model for Difference in Forms Test Scores
 ```{r}
 # Split data between x and y
 x.train <- model.matrix(formDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
@@ -505,28 +511,30 @@ ridge.mod3.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod3.full, s = best.lam, newx = x.test)
+predict(ridge.mod3.full, type = 'coefficients', s = best.lam)[1:12,]
 
 # MSE calculation
-mean((ridge.pred - y.test)^2)
+#mean((ridge.pred - y.test)^2)
 ```
 
+### Least Squares Model for Difference in Numbers Test Scores and Diagnostics
 ```{r}
 lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
 summary(lin.mod4.full)
-AIC(lin.mod4.full)
+#AIC(lin.mod4.full)
 
 yhat <- predict(lin.mod4.full, newdata = testing)
 y.test <- testing[, "numbDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 ```
 
 ```{r}
-
+par(mfrow=c(2,2))
 # residual plot
 res <- resid(lin.mod4.full)
-plot(fitted(lin.mod4.full), res)
+plot(fitted(lin.mod4.full), res, main = "Residual Plot")
 abline(0,0)
 
 # QQ plot
@@ -534,6 +542,7 @@ plot_qq(lin.mod4.full)
 
 ```
 
+### Ridge Regression Model for Difference in Numbers Test Scores 
 ```{r}
 # Split data between x and y
 x.train <- model.matrix(numbDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
@@ -556,28 +565,30 @@ ridge.mod4.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod4.full, s = best.lam, newx = x.test)
+predict(ridge.mod4.full, type = 'coefficients', s = best.lam)[1:12,]
 
 # MSE calculation
-mean((ridge.pred - y.test)^2)
+#mean((ridge.pred - y.test)^2)
 ```
 
+### Least Squares Model for Difference in Relational Terms Test Scores and Diagnostics
 ```{r}
 lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
 summary(lin.mod5.full)
-AIC(lin.mod5.full)
+#AIC(lin.mod5.full)
 
 yhat <- predict(lin.mod5.full, newdata = testing)
 y.test <- testing[, "relatDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 ```
 
 ```{r}
-
+par(mfrow=c(2,2))
 # residual plot
 res <- resid(lin.mod5.full)
-plot(fitted(lin.mod5.full), res)
+plot(fitted(lin.mod5.full), res, main = "Residual Plot")
 abline(0,0)
 
 # QQ plot
@@ -585,6 +596,7 @@ plot_qq(lin.mod5.full)
 
 ```
 
+### Ridge Regression Model for Difference in Relational Terms Test Scores
 ```{r}
 # Split data between x and y
 x.train <- model.matrix(relatDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
@@ -607,35 +619,37 @@ ridge.mod5.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod5.full, s = best.lam, newx = x.test)
+predict(ridge.mod5.full, type = 'coefficients', s = best.lam)[1:12,]
 
 # MSE calculation
-mean((ridge.pred - y.test)^2)
+#mean((ridge.pred - y.test)^2)
 ```
 
+### Least Squares Model for Difference in Classification Skills Test Scores and Diagnostics
 ```{r}
 lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
 summary(lin.mod6.full)
-AIC(lin.mod6.full)
+#AIC(lin.mod6.full)
 
 yhat <- predict(lin.mod6.full, newdata = testing)
 y.test <- testing[, "clasfDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 ```
 
 ```{r}
-
+par(mfrow=c(2,2))
 # residual plot
 res <- resid(lin.mod6.full)
-plot(fitted(lin.mod6.full), res)
+plot(fitted(lin.mod6.full), res, main = "Residual Plot")
 abline(0,0)
 
 # QQ plot
 plot_qq(lin.mod6.full)
-
 ```
 
+### Ridge Regression Model for Difference in Classification Skills Test Scores
 ```{r}
 # Split data between x and y
 x.train <- model.matrix(clasfDiff~site + sex + age + viewcat + setting + viewenc, training)[,-1]
@@ -658,14 +672,15 @@ ridge.mod6.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod6.full, s = best.lam, newx = x.test)
+predict(ridge.mod6.full, type = 'coefficients', s = best.lam)[1:12,]
 
 # MSE calculation
-mean((ridge.pred - y.test)^2)
+#mean((ridge.pred - y.test)^2)
 ```
 
 ## Research Question 1: Regression Tree Models 
 
-### Model 1
+### Model for Difference in Body Parts Test Scores
 
 ```{r}
 set.seed(1)
@@ -674,11 +689,10 @@ reg.tree.1 <- tree(bodyDiff ~ site + sex + age + viewcat + setting + viewenc, se
 summary(reg.tree.1)
 
 cv.reg.tree.1  <- cv.tree(reg.tree.1)
-plot(cv.reg.tree.1$size, cv.reg.tree.1$dev, type = "b")
-
+#plot(cv.reg.tree.1$size, cv.reg.tree.1$dev, type = "b")
 ```
 
-```{r}
+```{r fig.height = 3, fig.width = 4}
 
 prune.reg.tree.1  <- prune.tree(reg.tree.1, best = 4)
 plot(prune.reg.tree.1)
@@ -688,11 +702,10 @@ yhat <- predict(prune.reg.tree.1, newdata = testing)
 y.test <- testing[, "bodyDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
-
+#mean((yhat-y.test)^2)
 ```
 
-## Model 2
+### Model for Difference in Letters Test Scores
 
 ```{r}
 
@@ -702,11 +715,11 @@ reg.tree.2 <- tree(letDiff ~ site + sex + age + viewcat + setting + viewenc, ses
 summary(reg.tree.2)
 
 cv.reg.tree.2  <- cv.tree(reg.tree.2)
-plot(cv.reg.tree.2$size, cv.reg.tree.2$dev, type = "b")
+#plot(cv.reg.tree.2$size, cv.reg.tree.2$dev, type = "b")
 
 ```
 
-```{r}
+```{r fig.height = 3, fig.width = 4}
 
 prune.reg.tree.2  <- prune.tree(reg.tree.2, best = 3)
 plot(prune.reg.tree.2)
@@ -716,11 +729,11 @@ yhat <- predict(prune.reg.tree.2, newdata = testing)
 y.test <- testing[, "letDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 
 ```
 
-## Model 3
+### Model for Difference in Forms Test Scores
 
 ```{r}
 
@@ -730,11 +743,11 @@ reg.tree.3 <- tree(formDiff ~ site + sex + age + viewcat + setting + viewenc, se
 summary(reg.tree.3)
 
 cv.reg.tree.3  <- cv.tree(reg.tree.3)
-plot(cv.reg.tree.3$size, cv.reg.tree.3$dev, type = "b")
+#plot(cv.reg.tree.3$size, cv.reg.tree.3$dev, type = "b")
 
 ```
 
-```{r}
+```{r fig.height = 3, fig.width = 4}
 
 prune.reg.tree.3  <- prune.tree(reg.tree.3, best = 2)
 plot(prune.reg.tree.3)
@@ -744,11 +757,11 @@ yhat <- predict(prune.reg.tree.3, newdata = testing)
 y.test <- testing[, "formDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 
 ```
 
-## Model 4
+### Model for Difference in Numbers Test Scores
 
 ```{r}
 
@@ -758,11 +771,11 @@ reg.tree.4 <- tree(numbDiff ~ site + sex + age + viewcat + setting + viewenc, se
 summary(reg.tree.4)
 
 cv.reg.tree.4  <- cv.tree(reg.tree.4)
-plot(cv.reg.tree.4$size, cv.reg.tree.4$dev, type = "b")
+#plot(cv.reg.tree.4$size, cv.reg.tree.4$dev, type = "b")
 
 ```
 
-```{r}
+```{r fig.height = 3, fig.width = 4}
 
 prune.reg.tree.4  <- prune.tree(reg.tree.4, best = 3)
 plot(prune.reg.tree.4)
@@ -772,11 +785,11 @@ yhat <- predict(prune.reg.tree.4, newdata = testing)
 y.test <- testing[, "numbDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 
 ```
 
-## Model 5
+### Model for Difference in Relational Terms Test Scores
 
 ```{r}
 
@@ -786,11 +799,11 @@ reg.tree.5 <- tree(relatDiff ~ site + sex + age + viewcat + setting + viewenc, s
 summary(reg.tree.5)
 
 cv.reg.tree.5  <- cv.tree(reg.tree.5)
-plot(cv.reg.tree.5$size, cv.reg.tree.5$dev, type = "b")
+#plot(cv.reg.tree.5$size, cv.reg.tree.5$dev, type = "b")
 
 ```
 
-```{r}
+```{r fig.height = 3, fig.width = 4}
 
 prune.reg.tree.5  <- prune.tree(reg.tree.5, best = 5)
 plot(prune.reg.tree.5)
@@ -800,12 +813,11 @@ yhat <- predict(prune.reg.tree.5, newdata = testing)
 y.test <- testing[, "relatDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 
 ```
 
-## Model 6
-
+### Model for Difference in Classification Skills Test Scores
 ```{r}
 
 set.seed(1)
@@ -814,11 +826,11 @@ reg.tree.6 <- tree(clasfDiff ~ site + sex + age + viewcat + setting + viewenc, s
 summary(reg.tree.6)
 
 cv.reg.tree.6  <- cv.tree(reg.tree.6)
-plot(cv.reg.tree.6$size, cv.reg.tree.6$dev, type = "b")
+#plot(cv.reg.tree.6$size, cv.reg.tree.6$dev, type = "b")
 
 ```
 
-```{r}
+```{r fig.height = 3, fig.width = 6}
 
 prune.reg.tree.6  <- prune.tree(reg.tree.6, best = 2)
 plot(prune.reg.tree.6)
@@ -828,14 +840,16 @@ yhat <- predict(prune.reg.tree.6, newdata = testing)
 y.test <- testing[, "clasfDiff"]
 
 # Test MSE
-mean((yhat-y.test)^2)
+#mean((yhat-y.test)^2)
 
 ```
 
 
-## Research Question 2: Extra SVM models
+## Research Question 2
 
 ```{r svm-fitting-without-classWeight, eval= F}
+#additional svm models
+
 set.seed(315)
 costs <- c(0.001, 0.01, 0.1, 1, 5, 10, 100)
 # c(0.1, 0.2, 0.5, 0.7, 1, 2, 3, 4)
@@ -942,7 +956,7 @@ confusionMatrix(sigmoid.w.cm)
 confusionMatrix(poly.w.cm)
 ```
 
-## Accuracy Table of Random Forest & Logistic Regression
+### Accuracy Table of Random Forest & Logistic Regression
 
 ```{r rf-logReg-tab}
 rf.log.tab <- data.frame(Model = c("Random Forest",
@@ -953,7 +967,7 @@ kable_styling(all.accuracy, bootstrap_options = "striped", full_width = F, latex
 ```
 
 
-## Random Forest
+### Random Forest
 ```{r selecting-features-trees}
 
 set.seed(3215)
@@ -976,7 +990,7 @@ test.tree <- tree.data[-train.index,]
 rf.tree<- randomForest(site~., data=tree.data, subset=train.index,
                        mtry=4, importance=TRUE)
 
-importance(rf.tree)
+#importance(rf.tree)
 
 rf.pred <- predict(rf.tree, newdata=test.tree)
 
@@ -984,10 +998,10 @@ tree.conMatrix <- table(true=test.data[,"site"],
                          pred=rf.pred)
 confusionMatrix(tree.conMatrix)
 
-varImpPlot(rf.tree)
+#varImpPlot(rf.tree)
 ```
 
-## Logistic Regression
+### Logistic Regression
 ```{r log-reg, message=FALSE}
                    
 tree.features <- c("site", "age", "viewcat", "setting", "viewenc","prebody", "prelet","preform", "prenumb", "prerelat", "preclasf")
@@ -1006,10 +1020,10 @@ tabs <- table(true=test.log[, "site"],
 confusionMatrix(tabs)
 
 ##Backward selection
-iter.msg <- capture.output(log.tune <- train(site~(.)^2, data=train.log, method="multinom", direction="backward",
-                  k=log(3562)))
+#iter.msg <- capture.output(log.tune <- train(site~(.)^2, data=train.log, method="multinom", direction="backward",
+                  #k=log(3562)))
 
-tabs2 <- table(true=test.log[, "site"],
-              pred=predict(log.tune,newdata=test.log))
-confusionMatrix(tabs2)
+#tabs2 <- table(true=test.log[, "site"],
+              #pred=predict(log.tune,newdata=test.log))
+#confusionMatrix(tabs2)
 ```
