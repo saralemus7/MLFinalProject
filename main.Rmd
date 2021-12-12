@@ -505,6 +505,7 @@ text(prune.reg.tree.1, pretty = 0)
 
 yhat <- predict(prune.reg.tree.1, newdata = testing)
 y.test <- testing[, "bodyDiff"]
+summary(prune.reg.tree.1)
 
 # Test MSE
 mean((yhat-y.test)^2)
