@@ -1,7 +1,7 @@
 ---
 title: "Analyzing and Predicting the Relationships between Sesame Street Viewership and Test Scores among School Children"
 author: "Angela Wang, QiHan Zhou, Matthew Murray, Michelle Mao, Sara Lemus, Sophie Dalldorf"
-date: "12/9/2021"
+date: "12/13/2021"
 output: pdf_document
 ---
 
@@ -13,6 +13,7 @@ knitr::opts_chunk$set(fig.pos = "h", out.extra = "")
 ```{r loading-libraries}
 library(foreign)
 library(tidyverse)
+
 library(e1071)
 library(tree)
 library(gbm)
@@ -86,9 +87,9 @@ $$ numbDiff = 15.39 \ + \ 2.56 \ (site2) \ + \ 3.20 \ (viewcat3) \ + \ 3.64 \ (v
 $$ relatDiff = 18.49 \ + \ 2.42 \ (site4) \ + \ 2.96 \ (viewcat4) $$
 $$ clasfDiff = 10.95 \ + \ 4.06 \ (viewcat4) $$
 
-~Talk about why we chose regression tree models~
+In addition to linear regression models, we also decided to use regression tree models to predict differences in test scores. Like linear regression, regression trees are not the most competitive in terms of predictive power or accuracy, but they are easy to interpret and can provide important inferences into the relationships between covariates and the response variable. 
 
-In the context of a regression tree, the deviance is simply the sum of the squared errors.
+The process of building the trees was very simple. After initially building the tree, we then performed cross validation to determine if pruning the tree would improve the deviance (the sum of the squared errors) for the tree. Using the cross validation plot that was then created, we choose the number of nodes for the tree that minimized the deviance. 
 
 ## Research Question 2
 In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question. We also implemented a classification tree and a logistic model to answer this question as well; however, these models did not perform as well on our data (See Appendix for more details). Thus, a SVM was the most appropriate model choice for our research goals. Our full model formula is:
@@ -117,6 +118,95 @@ kable_styling(table, bootstrap_options = "striped", full_width = F, latex_option
 ```
 
 From the results of the above table, one can see that the ridge regression models have the best performance, although the performance of the regression trees are very similar . For each response variable except ``bodyDiff``, the ridge regression model reports the lowest test MSE, although the difference in performance between the ridge regression and the regression tree is very marginal. 
+
+### Interpretations  
+
+Linear Regression Models
+
+Looking at the least-squares linear models, we can note a few important features regarding predicting whether a child’s test scores will increase. For ``bodydiff``, or the difference between post and pre-tests scores for the recognition of body parts, we see that the intercept is 16.43, meaning the baseline difference between post score and prescore is positive. This means that the post test results are higher, however, as noted by the other predictors, this difference between post and pre gets larger as the site increases. We see if a child is ``site3``, or an advantaged rural child, the difference between their scores goes up by 2.45. For a disadvantaged rural child, the difference increases even more by 2.97 and for a disadvantaged Spanish speaking child, the difference goes up by 3.30. This indicates that for children from more disadvantaged backgrounds, the difference between the scores increases as compared to the two other sites.
+
+
+For differences in letter recognition scores, we note the intercept is 10.52, the baseline difference. We see for 4 year old advantaged children from the suburbs (``site2``) this difference increases by 3.09. However, interestingly enough for an advantaged rural child (``site3``), the difference in test scores decreases by 2.86. It also seems that the frequency of watching Sesame Street has an effect on letter scores with viewcat3 or watching 3-5 times a week increasing the difference by 4.85 and watching more than 5 times a week increasing the difference by 4.77. 
+
+For recognizing forms, the intercept is 16.04 and it seems that watching Sesame Street more than 5 times a week (``viewcat4``) , further increases this difference by 2.48. For numbers, the intercept is 15.39. We note that  for an 4 year old advantaged child from the suburbs, the difference in number scores increases by 2.56. Watching Sesame Street 3-5 times a week (``viewcat3``) increases the difference by 3.20, and watching more than 5 times a week increases the difference by 3.64.  For difference in relational term scores, the intercept is 18.49, the largest of all intercepts and the difference is further increased for a disadvantaged Spanish speaking child by 2.42. For those who watch more than 5 times a week, the difference increases by 2.96. For classification score differences, the intercept is 10.95. The only variable that increases this difference is the frequency of viewing, with those that watch Sesame Street more than 5 times a week increasing the difference by 4.06.
+In summary, we note that the variables that affect the difference in post and pre test scores from these linear regression models are mainly from site (demographic/background) and viewcat (frequency of viewing). It makes sense that kids who watched more Sesame street, especially those that watched more than 1-2 times a week had larger differences between their pre and post test scores.We also see that in general, the post scores are higher than the pre test scores especially for body parts,relational terms, and forms as their intercept values were the highest.
+
+
+
+Regression Tree 1  
+  
+* We see that if a child is in site 1 and 2 (3-5 year old disadvantage child from the innter city, 4 year old advantage child from the suburbs respectively)
+    - They are younger than 46.5 months or 3.87 years old
+        - They watch sesame street either once/twice per week or 3-5 times per week
+            - The predicted difference is 11.95
+        - They watch sesame street either rarely, or more than 5 times per week
+            - The predicted difference is 17.65
+    -  They are older than or equal to 3.87 years old/46.5 months
+        - The predicted difference is 11.37
+* If the child is in site 3, 4, 5 (an advantaged rural child, a disadvantaged rural child,  disadvantaged Spanish speaking child)
+    - The predicted difference is 14.30
+
+
+Regression Tree 2  
+For difference in letter recognition scores:  
+
+* If the child is in site 1, 3, 4, 5 ( 3-5 year old disadvantaged child from the inner city,  an advantaged rural child,  a disadvantaged rural child. ,a value of 5 represents a disadvantaged Spanish speaking child)
+    - They view Sesame Street either rarely or once/twice per week
+        - The predicted difference is 12.37
+    - They view Sesame Street either 3-5 times a week or more than 5 times a week
+        - The predicted difference is 16.56
+* If the child is in site 2 (4 year old advantaged child from the suburbs)
+    - The predicted difference is  20.24
+
+Regression Tree 3  
+For difference in form recognition scores:  
+
+* If the child rarely watches Sesame Street (viewcat: 1)
+    - They are less than 46.5 months (~3.875 years old)
+        - The predicted difference is 17.96
+    - They are older than or equal to 46.5 months (~3.875 years old)
+        - The predicted difference is  12.94
+* The child watches either once/twice per week, or  3-5 times a week, or more than 5 times per week
+    - The predicted differences is 15.72
+
+Regression Tree 4  
+For difference in numbers testing scores:  
+
+* If the child watches Sesame Street 3-5 times a week or more (``viewcat`` values of 3 and 4)
+    - The predicted difference is 20.83
+* If the child watches Sesame Street rarely or once/twice per week (``viewcat`` values of 1 and 2)
+    - If the child is a 4-year-old advantaged child from the suburbs or a disadvantaged Spanish speaking child
+        - The predicted difference is 21.29
+    - If the child is a 3-5 year old disadvantaged child from the inner city, an advantaged rural child, or a disadvantaged rural child
+        - The predicted difference is 17.51
+
+Overall, this tree shows that for children who watch Sesame Street frequently, the improvement in numbers testing is greater than some of the children who watch Sesame Street less frequently, depending on the child’s background. 
+
+Regression Tree 5
+For difference in relation terms scores:  
+
+* If the child is less than 38-months-old (3.16-years-old):
+    - The predicted difference is 20.22
+* If the child is greater than 38-months-old (3.16-years-old):  
+    - If the child is a 3-5 year old disadvantaged child from the inner city, a 4 year old advantaged child from the suburbs, or a disadvantaged Spanish speaking child:
+        - The predicted difference is 14.60
+    - If the child is an advantaged or disadvantaged rural child:
+        - If the child watches Sesame Street rarely, once/twice per week, or 3-5 times per week:  
+            - If the child watches Sesame Street at home the predicted difference is 17.12
+            - If the child watches Sesame Street at school the predicted difference is 13.59
+        - If the child watches Sesame Street more than 5 times per week:
+            - The predicted difference is 19.30
+
+Regression Tree 6  
+For difference in classification skills scores:  
+
+* If the child rarely watches Sesame Street (``viewcat`` values of 1):
+    - The predicted difference is 12.16
+* If the child watches Sesame Street once/twice a week or more (``viewcat`` values of 2-4):
+    - The predicted difference is 15.54
+
+Overall, this tree demonstrates that children who watch Sesame Street more frequently show a greater improvement in classification skills testing than children who rarely watch Sesame Street.
+
 
 ```{r classMod-accuracy-tab}
 classfMod.tab <- data.frame(Model = c("Linear Kernel SVM",
