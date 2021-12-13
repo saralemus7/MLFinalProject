@@ -71,15 +71,13 @@ We address our research questions using various machine modeling techniques. Mor
 
 # Data
 
-The data was collected in the early 1970s by researchers from Educational Testing Service, and the actual dataset itself was retrieved from a Columbia University database [3]. The researchers sampled children representative of 5 economically advantaged and disadvantaged populations in the US. The children were randomly assigned to either receive encouragement to watch Sesame Street or not to receive encouragement. The children in the encouragement group were given promotional materials about Sesame Street, and the ETS staff called and visited every week to ensure children were actively watching Sesame Street. Those who were not in this group did not receive any of this. Children were intially tested in 1970, and the post test evaluations were one year later.
+The data was collected in the early 1970s by researchers from Educational Testing Service (ETS), and the actual dataset itself was retrieved from a Columbia University database [3]. The researchers sampled children representative of 5 economically advantaged and disadvantaged populations in the US. The children were randomly assigned to either receive encouragement to watch Sesame Street or not to receive encouragement. The children in the encouragement group were given promotional materials about Sesame Street, and the ETS staff called and visited every week to ensure children were actively watching Sesame Street. Those who were not in the encouragement group did not receive any of this. The children were intially tested in 1970 on skills relating to body parts, letters, forms, numbers, relational terms, and classfication skills, and the post test evaluations were one year later after watching the show. While we considered using other data sources, we decided that it was not feasible due to the fact that there is not any further information available about the participants in the study and their backgrounds (other than the dataset from the Columbia University database).
 
-Our data contains 34 variables. The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The `viewcat` variable represents  the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The setting is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The `viewenc` column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). `Encour` is the same variable but with values 0 and 1, respectively. `Regular` is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). We decided that it was not feasible to use data from multiple sources due to the fact that there is not any further information available about the participants in the study (other than the dataset from the Columbia University database).
+Our data contains 34 variables. The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The `viewcat` variable represents  the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The setting is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The `viewenc` column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). `Encour` is the same variable but with values 0 and 1, respectively. `Regular` is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). 
 
 The `prebody, prelet, preform, prenumb, prerelat,` and `preclasf` columns all describe pretest scores on varying types of assessments (body parts, letters, forms, numbers, relational terms, and classification skills, respectively). The columns labeled `postbody, postlet, postform, postnumb, postrelat,` and `postclasf` are the children's respective post-test scores. We created the following variables - `bodydiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff` - to represent the difference in post-test scores and pretest scores for each child. Lastly, `peabody` represents a score of "mental age" for vocabulary maturity from the Peabody Picture Vocabulary Test.
 
 Our main focus will be on the new variables we created (`bodyDiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff`) and variables related to how often the children watch Sesame Street (`namely, viewcat and regular`). Lastly, we will look into the backgrounds of the children, including `site, sex,` and `age`.
-
-We decided to plot the distribution of post-test - pre-test scores for each test using boxplots. First, we created separate plots for different values of the variable ``site``, as we conjectured that a child's background would have an effect on his or her change in test scores. From these plots, it appears that children from some backgrounds show greater changes in test scores than others, but this change was something we knew that we could examine further in our models. 
 
 ## Plotting Differences in Unstandardized Scores By Students' Backgrounds
 
@@ -130,11 +128,13 @@ boxclasf <- ggplot(sesame, aes(x = clasfDiff, y = site)) +
 
 ```
 
-We also created separate plots for different values of the variable ``viewcat`` because we also assumed that the frequency at which children watch Sesame Street would affect their respective changes in test scores. One key takeaway from these plots is that accross all tests, the median value of post-test score - pre-test score is greater for children who watch Sesame Street very frequently (greater than 5 times a week) than for children who rarely watch Sesame Street. This trend suggests that Sesame Street has a positive educational impact on children by helping them improve their test scores. Again, however, this takeaway is something that we knew that we could examine further with our models. 
+We decided to plot the distribution of post-test - pre-test scores for each test using boxplots. First, we created separate plots for different values of the variable ``site``, as we conjectured that a child's background would have an effect on his or her change in test scores. From these plots, it appears that children from some backgrounds show greater changes in test scores than others, and we will further examine this relationship in our models. 
+
+We also created separate plots for different values of the variable ``viewcat`` because we also assumed that the frequency at which children watch Sesame Street would affect their respective changes in test scores. One key takeaway from these plots is that for each test, the median value of post-test score - pre-test score is greater for children who watch Sesame Street very frequently (greater than 5 times a week) than for children who rarely watch Sesame Street. This trend suggests that Sesame Street has a positive educational impact on children by helping them improve their test scores. Again, however, this takeaway is something that we will examine further with our models. 
 
 ## Plotting Differences in Unstandardized Scores By Viewership Frequency 
 
-```{r eval = FALSE}
+```{r}
 
 boxbody <- ggplot(sesame, aes(x = bodyDiff, y = as.factor(viewcat))) + 
   geom_boxplot(fill = "lightpink") + 
@@ -182,7 +182,7 @@ boxclasf <- ggplot(sesame, aes(x = clasfDiff, y = as.factor(viewcat))) +
 
 ```
 
-```{r eval = FALSE}
+```{r eval =F}
 ggplot(sesame, aes(x = numbDiff, y = as.factor(viewenc))) + 
   geom_boxplot(fill = "lightblue") +
   labs(title = "NumbDiff by Viewenc", x = "Post - Pre on Numbers") 
@@ -203,8 +203,6 @@ ggplot(sesame, aes(x = letDiff, y = as.factor(viewenc))) +
   labs(title = "LetDiff by Viewenc", x = "Post - Pre on Numbers") 
 ```
 
-
-
 # Methodology 
 
 ## Research Question 1
@@ -214,7 +212,7 @@ For our first research question, we seek to predict the difference in pre and po
 Before including these covariates in any model, we first encoded all of them as type categorical which is appropriate given that each number represents a level rather than a numerical value.
  
 
-```{r}
+```{r eval = F}
 ggplot(sesame, aes(x = numbDiff, y = as.factor(viewcat))) + 
   geom_boxplot(fill = "lightpink") +
   labs(title = "NumbDiff by ViewCat", x = "Post - Pre on Numbers") 
