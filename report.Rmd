@@ -416,9 +416,9 @@ kable_styling(table.svm.res, bootstrap_options = "striped", full_width = F, late
 svmTab <- data.frame(Truth = c("Class 1", "Class 2", "Class 3", "Class 4", "Class 5"), 
                      Class1.Prediction = c(6,1,0,3,0), 
                      Class2.Prediction = c(1,7,1,3,1),
-                     class3.Prediction = c(6,1,11,9,1),
-                     class4.Prediction = c(2,1,1,3,1),
-                     class5.Prediction = c(5,3,3,0,2))
+                     Class3.Prediction = c(6,1,11,9,1),
+                     Class4.Prediction = c(2,1,1,3,1),
+                     Class5.Prediction = c(5,3,3,0,2))
  
 table.svm.cm <- kable(svmTab, caption = "Class Weighted Linear Kernel SVM Confusion Matrix", booktabs=T)
 kable_styling(table.svm.cm, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
@@ -499,6 +499,8 @@ testing =sesame.q1[-train, ]
 ```
 
 ### Least Squares Model for Difference in Body Part Test Scores and Diagnostics
+
+
 ```{r}
 lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
 summary(lin.mod1.full)
@@ -510,6 +512,7 @@ y.test <- testing[, "bodyDiff"]
 # Test MSE
 #mean((yhat-y.test)^2)
 ```
+
 
 ```{r}
 # residual plot
@@ -545,7 +548,7 @@ ridge.mod1.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod1.full, s = best.lam, newx = x.test)
-predict(ridge.mod1.full, type = 'coefficients', s = best.lam)[1:12,]
+kable(predict(ridge.mod1.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -598,7 +601,7 @@ ridge.mod2.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod2.full, s = best.lam, newx = x.test)
-predict(ridge.mod2.full, type = 'coefficients', s = best.lam)[1:12,]
+kable(predict(ridge.mod2.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -650,7 +653,7 @@ ridge.mod3.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod3.full, s = best.lam, newx = x.test)
-predict(ridge.mod3.full, type = 'coefficients', s = best.lam)[1:12,]
+kable(predict(ridge.mod3.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -704,7 +707,7 @@ ridge.mod4.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod4.full, s = best.lam, newx = x.test)
-predict(ridge.mod4.full, type = 'coefficients', s = best.lam)[1:12,]
+kable(predict(ridge.mod4.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -758,7 +761,7 @@ ridge.mod5.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod5.full, s = best.lam, newx = x.test)
-predict(ridge.mod5.full, type = 'coefficients', s = best.lam)[1:12,]
+kable(predict(ridge.mod5.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -811,7 +814,7 @@ ridge.mod6.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod6.full, s = best.lam, newx = x.test)
-predict(ridge.mod6.full, type = 'coefficients', s = best.lam)[1:12,]
+kable(predict(ridge.mod6.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -821,7 +824,8 @@ predict(ridge.mod6.full, type = 'coefficients', s = best.lam)[1:12,]
 
 ### Model for Difference in Body Parts Test Scores
 
-```{r}
+```{r, include = F}
+library(broom)
 set.seed(1)
 
 reg.tree.1 <- tree(bodyDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
@@ -830,6 +834,7 @@ summary(reg.tree.1)
 cv.reg.tree.1  <- cv.tree(reg.tree.1)
 #plot(cv.reg.tree.1$size, cv.reg.tree.1$dev, type = "b")
 ```
+Variables used in tree construction:`site`, `age`, `viewcat`, `sex`, `viewenc`. Terminal nodes: 13. Residual mean deviance: 14.16.
 
 ```{r fig.height = 3, fig.width = 4}
 
@@ -846,8 +851,7 @@ y.test <- testing[, "bodyDiff"]
 
 ### Model for Difference in Letters Test Scores
 
-```{r}
-
+```{r include = F}
 set.seed(1)
 
 reg.tree.2 <- tree(letDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
@@ -855,8 +859,9 @@ summary(reg.tree.2)
 
 cv.reg.tree.2  <- cv.tree(reg.tree.2)
 #plot(cv.reg.tree.2$size, cv.reg.tree.2$dev, type = "b")
-
 ```
+
+Variables used in tree construction:`site`, `age`, `viewcat`, `setting`, `viewenc`. Terminal nodes: 12. Residual mean deviance: 18.63.
 
 ```{r fig.height = 3, fig.width = 4}
 
@@ -874,8 +879,7 @@ y.test <- testing[, "letDiff"]
 
 ### Model for Difference in Forms Test Scores
 
-```{r}
-
+```{r include = F}
 set.seed(1)
 
 reg.tree.3 <- tree(formDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
@@ -883,8 +887,9 @@ summary(reg.tree.3)
 
 cv.reg.tree.3  <- cv.tree(reg.tree.3)
 #plot(cv.reg.tree.3$size, cv.reg.tree.3$dev, type = "b")
-
 ```
+
+Variables used in tree construction:`site`, `age`, `viewcat`, `setting`. Terminal nodes: 10. Residual mean deviance: 15.88.
 
 ```{r fig.height = 3, fig.width = 4}
 
@@ -902,8 +907,7 @@ y.test <- testing[, "formDiff"]
 
 ### Model for Difference in Numbers Test Scores
 
-```{r}
-
+```{r include = F}
 set.seed(1)
 
 reg.tree.4 <- tree(numbDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
@@ -911,8 +915,9 @@ summary(reg.tree.4)
 
 cv.reg.tree.4  <- cv.tree(reg.tree.4)
 #plot(cv.reg.tree.4$size, cv.reg.tree.4$dev, type = "b")
-
 ```
+
+Variables used in tree construction:`site`, `age`,`sex`, `viewcat`, `setting`, `viewenc`. Terminal nodes: 18. Residual mean deviance: 13.64.
 
 ```{r fig.height = 3, fig.width = 4}
 
@@ -930,8 +935,7 @@ y.test <- testing[, "numbDiff"]
 
 ### Model for Difference in Relational Terms Test Scores
 
-```{r}
-
+```{r include = F}
 set.seed(1)
 
 reg.tree.5 <- tree(relatDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
@@ -939,8 +943,9 @@ summary(reg.tree.5)
 
 cv.reg.tree.5  <- cv.tree(reg.tree.5)
 #plot(cv.reg.tree.5$size, cv.reg.tree.5$dev, type = "b")
-
 ```
+
+Variables used in tree construction:`site`, `age`, `viewcat`, `setting`, `sex`. Terminal nodes: 10. Residual mean deviance: 15.3.
 
 ```{r fig.height = 3, fig.width = 4}
 
@@ -957,8 +962,7 @@ y.test <- testing[, "relatDiff"]
 ```
 
 ### Model for Difference in Classification Skills Test Scores
-```{r}
-
+```{r include = F}
 set.seed(1)
 
 reg.tree.6 <- tree(clasfDiff ~ site + sex + age + viewcat + setting + viewenc, sesame.q1, subset = train)
@@ -966,8 +970,9 @@ summary(reg.tree.6)
 
 cv.reg.tree.6  <- cv.tree(reg.tree.6)
 #plot(cv.reg.tree.6$size, cv.reg.tree.6$dev, type = "b")
-
 ```
+
+Variables used in tree construction:`site`, `age`, `viewcat`, `sex`. Terminal nodes: 14. Residual mean deviance: 29.66.
 
 ```{r fig.height = 3, fig.width = 6}
 
