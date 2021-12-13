@@ -106,7 +106,41 @@ bodyDiffplot + letDiffplot + formDiffplot + numbDiffplot + relatDiffplot + clasf
 
 The six variables above were calculated by subtracting pre-test scores from post-test scores, so they are all numerical. The distributions of these six variables (bodyDiff, letDiff, formDiff, numbDiff, relatDiff, and clasfDiff) all appear to be roughly normal and unimodal. BodyDiff, letDiff, formDiff, relatDiff, and classDiff do not appear to have any obvious extreme outliers. Numbdiff, however, seems to be slightly left-skewed with outliers to the left -20. All of the six variables appear to have centers between 2 and 4. 
 
+```{r}
+bodyDiffplot <- ggplot(sesame, aes(x = bodyDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of bodyDiff", x = "Post - Pre on Body Parts", y = "Count") +
+  theme_minimal()
 
+numbDiffplot <- ggplot(sesame, aes(x = numbDiff)) + 
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of numbDiff", x = "Post - Pre on Numbers", y = "Count") +
+  theme_minimal()
+
+viewcatplot <- ggplot(sesame, aes(x = factor(viewcat))) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Distribution of Viewcat", x = "Frequency of viewing Sesame", y = "Count") +
+  scale_x_discrete("Frequency of Viewing Sesame", labels=c("rarely", "1-2 pw", "3-5 pw", ">5 pw")) +
+  theme_minimal() +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
+
+siteplot <- ggplot(sesame, aes(x = factor(site))) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "Distribution of Site", y = "Count") +
+  scale_x_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 50, hjust=1)) +
+  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
+
+ageplot <- ggplot(sesame, aes(x = age)) +
+  geom_histogram(fill = "lightblue") +
+  labs(title = "Distribution of Age", x = "Age in Months", y = "Count") +
+  theme_minimal()
+
+(bodyDiffplot + numbDiffplot + ageplot) / (viewcatplot + siteplot + ageplot)
+
+```
 
 We will now examine the distrubtions of the variables related to how often children watch Sesame Street (namely, viewcat and regular).
 

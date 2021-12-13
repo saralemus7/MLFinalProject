@@ -66,12 +66,12 @@ The first question directly examines the relationship between Sesame Street and 
 
 The second question investigates the relationship between various subject pre-test scores and children of different income and living situations. By understanding this, we can develop a more more nuanced understanding of how low income children may be affected by their background. The absence of early education for low-income students in America has been a problem for decades, and still persists today. One statistic suggests that a mere 18% of low-income students are enrolled in high-quality pre-K. Location also plays a role: 55% of children who live in rural areas lack access to high-quality education [2]. This lack of access to pre-K disproportionately affects students from disadvantaged backgrounds, as they are left less ready for kindergarten and may suffer further setbacks compared to their peers as they continue their education into elementary, middle, and high school. Thus, it is critical to further understand the relationship between the background of children and how this may affect their ability to test well on critical subjects like learning and math. 
 
-We address our research questions using various machine modeling techniques. More specifically, we will use ____ an SVM to classify the background that the child is from.
+We address our research questions using various machine modeling techniques. More specifically, for our first research question we will perform a comparison of least squares, ridge, and tree regression models to find the one with the lowest test MSE, which after performing our analysis ends up being ridge regression. For our second question, we will fit a multi-class SVM classifier to predict what background a child comes from.
 
 
 # Data
 
-The data was collected in the early 1970s by researchers from Educational Testing Service, and the actual dataset itself was retrieved from a Columbia University database found [here](http://www.stat.columbia.edu/~gelman/arm/examples/sesame/). Our data contains 34 variables. The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The `viewcat` variable represents  the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The setting is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The `viewenc` column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). `Encour` is the same variable but with values 0 and 1, respectively. `Regular` is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). 
+The data was collected in the early 1970s by researchers from Educational Testing Service, and the actual dataset itself was retrieved from a Columbia University database found [here](http://www.stat.columbia.edu/~gelman/arm/examples/sesame/). Our data contains 34 variables. The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The `viewcat` variable represents  the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The `setting` variable is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The `viewenc` column refers to if the child was encouraged to watch or not by  the researchers (1 = child encouraged, 2 = child not encouraged). `Encour` is the same variable but with values 0 and 1, respectively. `Regular` is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). 
 
 The `prebody, prelet, preform, prenumb, prerelat,` and `preclasf` columns all decribe pretest scores on varying types of assessments (body parts, letters, forms, numbers, relational terms, and classification skills, respectively). The columns labeled `postbody, postlet, postform, postnumb, postrelat,` and `postclasf` are the children's respective post-test scores. We created the following variables - `bodydiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff` - to represent the difference in post-test scores and pretest scores for each child. Lastly, `peabody` represents a score of "mental age" for vocabulary maturity from the Peabody Picture Vocabulary Test.
 
@@ -124,41 +124,6 @@ boxclasf <- ggplot(sesame, aes(x = clasfDiff, y = site)) +
 
 ```
 
-```{r}
-bodyDiffplot <- ggplot(sesame, aes(x = bodyDiff)) + 
-  geom_histogram(fill = "lightblue") +
-  labs(title = "Distribution of bodyDiff", x = "Post - Pre on Body Parts", y = "Count") +
-  theme_minimal()
-
-numbDiffplot <- ggplot(sesame, aes(x = numbDiff)) + 
-  geom_histogram(fill = "lightblue") +
-  labs(title = "Distribution of numbDiff", x = "Post - Pre on Numbers", y = "Count") +
-  theme_minimal()
-
-viewcatplot <- ggplot(sesame, aes(x = factor(viewcat))) +
-  geom_bar(fill = "lightblue") +
-  labs(title = "Distribution of Viewcat", x = "Frequency of viewing Sesame", y = "Count") +
-  scale_x_discrete("Frequency of Viewing Sesame", labels=c("rarely", "1-2 pw", "3-5 pw", ">5 pw")) +
-  theme_minimal() +
-  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
-
-siteplot <- ggplot(sesame, aes(x = factor(site))) +
-  geom_bar(fill = "lightblue") +
-  labs(title = "Distribution of Site", y = "Count") +
-  scale_x_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
-  theme_minimal() +
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_text(angle = 50, hjust=1)) +
-  geom_text(aes(label = ..count..), stat = "count", vjust = 1.5, colour = "white")
-
-ageplot <- ggplot(sesame, aes(x = age)) +
-  geom_histogram(fill = "lightblue") +
-  labs(title = "Distribution of Age", x = "Age in Months", y = "Count") +
-  theme_minimal()
-
-(bodyDiffplot + numbDiffplot + ageplot) / (viewcatplot + siteplot + ageplot)
-
-```
 
 For the purposes of our analysis, we first examined the distributions of all variables. Shown above are our plots of a few important variables, including `bodyDiff, numbDiff, Viewcat, Site,` and `Age`. All of these variables appear to be relatively normal and unimodal, raising no concerns for necessary transformations.
 
@@ -167,15 +132,76 @@ For the purposes of our analysis, we first examined the distributions of all var
 
 ## Research Question 1
 
-We decided to utilize three different types of models to gain inference and predict the difference in test scores that occurs after subjects watch Sesame Street: (1) least-squares regression model (2) ridge regression model and (3) regression tree model. There are six different test scores in the data set, so we fit three models for each difference in test score variable. Each model took the following variables as covariates: ``site``, ``sex``, ``viewcat``, ``setting``, ``viewenc``. Before creating these models, we factored those variables to encode them as categorical. Initially, our least-squares and ridge regression models also took into account all possible two-way interaction terms between the variables. However, we noticed that both the Akaike Information Criterion (AIC) and adjusted-$R^2$ values were higher for models that did not include any interaction effects. That reason, coupled with the lack of apparent interaction effects in our exploratory data analysis and the fact that we wanted our linear models to be very interpretable, is why we decided not to include any interaction effects in our final linear models. 
+For our first research question, we seek to predict the difference in pre and post-test after children watch Sesame Street. More specifically, for all 6 tests we choose to let the difference in pre and post-test scores for that given test be the response variable, and look at the following variables as covariates: ``site``, ``sex``, `age`, `viewcat`, ``setting``, ``viewenc``. We choose to look at site (which is representative of the child's background) because, as mentioned in the introduction, Sesame Street is particularly aimed at helping underprivileged young children learn fundamental skills. We want to further study this potential association between the background of the child and the difference between their two test scores. We adjust for the age and sex of the child as well as whether or not they viewed the show at home or school, since both of these variables may potentially have an affect on their pre and post-test scores. We also include the frequency of which children watched Sesame Street (`viewcat`) as well as whether or not they were encouraged to watch Sesame Street by the researchers. This is motivated by EDA plots that suggest that for all tests, children who were encouraged to watch have higher test differences than those who were not, and children who watched Sesame Street frequently had higher median test differences than children who watched rarely. Thus, we wanted to include these factors in our model since we believe they are important to include when trying to accurately predict the difference between pre and post-test scores.
 
-One problem that we envisioned when evaluating and comparing the different models is that the tests are scored on different scales. For example, the scores for the test on knowledge of body parts (noted by ``bodyDiff``) range from 0-32, while those of the test on letters (noted by ``letDiff``) range from 0-58. To be able to aptly compare the mean squared error (MSE) between models, we also decided to convert each response variable to the same range. More specifically, we scaled each variable to the arbitrary range [0, 30]. Lastly, we randomly split the data between testing and training, using 70% of the data for training and 30% of the data for testing.
+Before including these covariates in any model, we first encoded all of them as type categorical which is appropriate given that each number represents a level rather than a numerical value.
 
-We first decided to use least-squares regression models due to the fact that they provide apt inference into the relationship between the covariates and the response variable. Thereafter, we decided to use a ridge regression model due to the fact that ridge regression often provides performance improvements by shrinking slope coefficients. While shrinkage may introduce bias to a model, it decreases the variance and increases the precision of the slope coefficient estimates. The shrinkage is achieved by applying a shrinkage parameter, $\lambda$, to the Euclidean norm of a slope coefficient. Doing so slightly increases the bias of our model (as least-squares regression coefficient estimates are unbiased) but can also significantly decrease the variance (and increase the precision) of our regression coefficients. This slight increase in bias but significant decrease in variance usually decreases the MSE of a model.
+```{r eval = FALSE}
+ggplot(sesame, aes(x = numbDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "NumbDiff by ViewCat", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = letDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "LetDiff by ViewCat", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = bodyDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "BodyDiff by ViewCat", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = relatDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "RelatDiff by ViewCat", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = clasfDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "ClasfDiff by ViewCat", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = letDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "LetDiff by ViewCat", x = "Post - Pre on Numbers") 
+```
+
+
+```{r eval = FALSE}
+ggplot(sesame, aes(x = numbDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "NumbDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = letDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "LetDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = bodyDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "BodyDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = relatDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "RelatDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = clasfDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "ClasfDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = letDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "LetDiff by Viewenc", x = "Post - Pre on Numbers") 
+```
+
+
+After identifying the response variables and covariates, we must choose an appropriate model. There are many different ways to predict our continuous response variable, however we identified 3 primary candidates: least squares regression, ridge regression, and regression trees. All models allow us to predict the test score differences, though have different ways of doing so. In order to pick a final model that best aligns with our research question, we choose to fit these 3 different models on our 6 different test score differences. We will then compare the predictive performance of each model as well as respective model properties to make an informed decision about which model is best to use for our results and conclusion. Next, we will discuss how we specifically fit all 3 model types to the data.
+
+#### Least-squares Regression
+We first decide to consider least-squares regression models as a potential model due to the fact that they provide apt inference into the relationship between the covariates and the response variable. Our regression models follow the general form:
+
+$$ Pretest-Posttest = \beta_0 \ + \ \beta_1 \ (\text{site = 2})+ \ \beta_2\ (\text{site = 3})+ \ \beta_3 \ (\text{site = 4})+ \ \beta_5 \ (\text{site = 5}) + \ \beta_6 \ (\text{sex =female}) \\ + \ \beta_7 \ (age) \ 
++ \ \beta_8 \ (\text{ViewCat = Once or Twice per Week})+ \ \beta_9\ (\text{ViewCat = Three to Five Times per Week})+ \\ \beta_{10} \ (\text{ViewCat = 5 Times a Week or More on Avg})
++  \ \beta_{11} \ (\text{Setting = School}) +  \ \beta_{12} \ (\text{ViewEnc = Not Encouraged})$$
+
+We perform this for all 6 different test types. 
+
+#### Ridge regression
+
+We also decide on ridge regression as a candidate model due to the fact that ridge regression often provides performance improvements by shrinking slope coefficients. While shrinkage may introduce bias to a model, it decreases the variance and increases the precision of the slope coefficient estimates. The shrinkage is achieved by applying a shrinkage parameter, $\lambda$, to the Euclidean norm of a slope coefficient. This slight increase in bias but significant decrease in variance usually decreases the MSE of a model.
 
 We tuned our $\lambda$ parameter using 10-fold cross validation. More specifically, we computed the cross-validation error rate for our model for a grid of $\lambda$ values. Thereafter, we selected the $\lambda$ value for which the cross-validation error is the smallest. 
 
-Initially, we were inclined to use least absolute shrinkage and selection operator (LASSO) regression. The main advantage of LASSO regression over ridge regression is that LASSO regression performs variable selection by setting the slope coefficients of inert predictors to 0. The reason why we initially thought that LASSO regression would work better than ridge regression is that in most of our linear models, only a small subset of variables are significant at a 95% significance level.  However, our ridge regression models performed marginally better than our LASSO regression models, so for this reason, we decided to report the MSE’s for the ridge regression models. The ridge regression models are:
+Initially, our least-squares and ridge regression models also took into account all possible two-way interaction terms between the variables. However, we noticed that both the Akaike Information Criterion (AIC) and adjusted-$R^2$ values were higher for models that did not include any interaction effects. That reason, coupled with the lack of apparent interaction effects in our exploratory data analysis and the fact that we wanted our linear models to be interpretable, is why we decided not to include any interaction effects in our final linear models. 
+
+One problem that we envisioned when evaluating and comparing the different models is that the tests are scored on different scales. For example, the scores for the test on knowledge of body parts (noted by ``bodyDiff``) range from 0-32, while those of the test on letters (noted by ``letDiff``) range from 0-58. To be able to aptly compare the mean squared error (MSE) between models, we also decided to convert each response variable to the same range. More specifically, we scaled each variable to the arbitrary range [0, 30]. Lastly, we randomly split the data between testing and training, using 70% of the data for training and 30% of the data for testing.
+
+ The ridge regression models are:
 
 $$ bodyDiff = 16.01 \ + \ 0.94 \ (site3) \ + \ 0.95 \ (site4) \ + \ 1.34 \ (site5) $$
 $$ letDiff = 12.09 \ + \ 3.09 \ (site2) \ - \ 2.56 \ (site3) \ + 3.53 \ (viewcat3) \ + 3.47 \ (viewcat4) $$
@@ -198,18 +224,16 @@ $$ clasfDiff = 10.95 \ + \ 4.06 \ (viewcat4) $$
 
 Regarding model diagnostics, all models seemed to aptly satisfy the linearity condition, as the residual plots for each of the linear regression models have no discernible pattern or structure. The satisfaction of this condition ensures that there is in fact a linear relationship between the response variable and the predictors. The constant variance (homoscedasticity) condition of linear regression seems to be satisfied as well, as the vertical spread of the residuals is relatively constant across each of the plots. Lastly, the Normality assumption of linear regression seems to be aptly satisfied. For each of the models, the points fall along a straight diagonal line on the normal quantile (QQ) plot, indicating that the residuals follow a Normal Distribution. 
 
-In addition to linear regression models, we also decided to use regression tree models to predict differences in test scores. Like linear regression, regression trees are not the most competitive in terms of predictive power or accuracy, but they are easy to interpret and can provide important inferences into the relationships between covariates and the response variable. 
+#### Regression Trees
+
+Our third candidate model is the regression tree. Similar to linear regression, regression trees are not the most competitive in terms of predictive power or accuracy, but they are easy to interpret and can provide important inferences into the relationships between covariates and the response variable. 
 
 The process of building the trees was very simple. After initially building the tree, we then performed cross validation to determine if pruning the tree would improve the deviance (the sum of the squared errors) for the tree. Using the cross validation plot that was then created, we choose the number of nodes for the tree that minimized the deviance. 
 
 ## Research Question 2
-<<<<<<< HEAD
 
-In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question and it has a few different
-kernels that can place complex decision boundaries. We also implemented a classification tree and a logistic model to answer this question as well (See Appendix for more details). The three models have relatively similar performance in terms of overall prediction accuracy. However, we decided to present the SVM model as our final model since we have spent a considerable amount of time researching different optimization methods to boost its performance. Our full model formula is:
-=======
 In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). There is often an association between poorer educational access and outcomes for disadvantaged, rural children; thus, we want to see if this association is strong enough that we can predict the socioeconomic background of a child based on their test scores. Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question and it has a few different kernels that can place complex decision boundaries. We also implemented a classification tree and a logistic model to answer this question as well (See Appendix for more details). The three models have relatively similar performance in terms of overall prediction accuracy. However, we decided to present the SVM model as our final model since we have spent a considerable amount of time researching different optimization methods to boost its performance. Our full model formula is:
->>>>>>> b72b9220abaec9732744b314ee81f79fbf190b62
+
 $$SVM(site \mathtt{\sim} female + male + age + bodyparts_{pretest}+ letters_{pretest} + $$
 $$forms_{pretest} +numbers_{pretest} + relationalterms_{pretest} + classificationskills_{pretest} )$$
 
