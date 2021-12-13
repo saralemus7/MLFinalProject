@@ -29,6 +29,9 @@ library(scales)
 library(glmnet)
 library(kableExtra)
 library(car)
+library(gtsummary)
+library(flextable)
+library(formattable)
 library(lmvar)
 sesame <- read.dta("sesame.dta")
 sesame <- sesame %>%
@@ -501,8 +504,16 @@ testing =sesame.q1[-train, ]
 
 ```{r}
 lin.mod1.full <- lm(bodyDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
-summary(lin.mod1.full)
+#summary(lin.mod1.full)
 #AIC(lin.mod1.full)
+tbl_regression(lin.mod1.full, 
+               pvalue_fun = ~style_pvalue(.x, digits = 3),
+               label = list(site ~ "Site", sex ~ "Sex", age ~ "Age", viewenc~ "Encouraged to Watch", setting ~ "Where Sesame Street is Viewed", viewcat ~ "Frequency of Watching"),
+               intercept=T,  estimate_fun = function(x) style_sigfig(x, digits = 3)) %>%
+  bold_p(t = 0.05) %>%
+  bold_labels() %>%
+  italicize_levels() %>%
+  as_flex_table() 
 
 yhat <- predict(lin.mod1.full, newdata = testing)
 y.test <- testing[, "bodyDiff"]
@@ -555,8 +566,17 @@ kable(predict(ridge.mod1.full, type = 'coefficients', s = best.lam)[1:12,], col.
 ### Least Squares Model for Difference in Letters Test Scores and Diagnostics
 ```{r}
 lin.mod2.full <- lm(letDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
-summary(lin.mod2.full)
+#summary(lin.mod2.full)
 #AIC(lin.mod2.full)
+
+tbl_regression(lin.mod2.full, 
+               pvalue_fun = ~style_pvalue(.x, digits = 3),
+               label = list(site ~ "Site", sex ~ "Sex", age ~ "Age", viewenc~ "Encouraged to Watch", setting ~ "Where Sesame Street is Viewed", viewcat ~ "Frequency of Watching"),
+               intercept=T,  estimate_fun = function(x) style_sigfig(x, digits = 3)) %>%
+  bold_p(t = 0.05) %>%
+  bold_labels() %>%
+  italicize_levels() %>%
+  as_flex_table() 
 
 yhat <- predict(lin.mod2.full, newdata = testing)
 y.test <- testing[, "letDiff"]
@@ -608,8 +628,17 @@ kable(predict(ridge.mod2.full, type = 'coefficients', s = best.lam)[1:12,], col.
 ### Least Squares Model for Difference in Forms Test Scores and Diagnostics
 ```{r}
 lin.mod3.full <- lm(formDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
-summary(lin.mod3.full)
+#summary(lin.mod3.full)
 #AIC(lin.mod3.full)
+
+tbl_regression(lin.mod3.full, 
+               pvalue_fun = ~style_pvalue(.x, digits = 3),
+               label = list(site ~ "Site", sex ~ "Sex", age ~ "Age", viewenc~ "Encouraged to Watch", setting ~ "Where Sesame Street is Viewed", viewcat ~ "Frequency of Watching"),
+               intercept=T,  estimate_fun = function(x) style_sigfig(x, digits = 3)) %>%
+  bold_p(t = 0.05) %>%
+  bold_labels() %>%
+  italicize_levels() %>%
+  as_flex_table() 
 
 yhat <- predict(lin.mod3.full, newdata = testing)
 y.test <- testing[, "formDiff"]
@@ -660,8 +689,17 @@ kable(predict(ridge.mod3.full, type = 'coefficients', s = best.lam)[1:12,], col.
 ### Least Squares Model for Difference in Numbers Test Scores and Diagnostics
 ```{r}
 lin.mod4.full <- lm(numbDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
-summary(lin.mod4.full)
+#summary(lin.mod4.full)
 #AIC(lin.mod4.full)
+
+tbl_regression(lin.mod4.full, 
+               pvalue_fun = ~style_pvalue(.x, digits = 3),
+               label = list(site ~ "Site", sex ~ "Sex", age ~ "Age", viewenc~ "Encouraged to Watch", setting ~ "Where Sesame Street is Viewed", viewcat ~ "Frequency of Watching"),
+               intercept=T,  estimate_fun = function(x) style_sigfig(x, digits = 3)) %>%
+  bold_p(t = 0.05) %>%
+  bold_labels() %>%
+  italicize_levels() %>%
+  as_flex_table() 
 
 yhat <- predict(lin.mod4.full, newdata = testing)
 y.test <- testing[, "numbDiff"]
@@ -714,8 +752,17 @@ kable(predict(ridge.mod4.full, type = 'coefficients', s = best.lam)[1:12,], col.
 ### Least Squares Model for Difference in Relational Terms Test Scores and Diagnostics
 ```{r}
 lin.mod5.full <- lm(relatDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
-summary(lin.mod5.full)
+#summary(lin.mod5.full)
 #AIC(lin.mod5.full)
+
+tbl_regression(lin.mod5.full, 
+               pvalue_fun = ~style_pvalue(.x, digits = 3),
+               label = list(site ~ "Site", sex ~ "Sex", age ~ "Age", viewenc~ "Encouraged to Watch", setting ~ "Where Sesame Street is Viewed", viewcat ~ "Frequency of Watching"),
+               intercept=T,  estimate_fun = function(x) style_sigfig(x, digits = 3)) %>%
+  bold_p(t = 0.05) %>%
+  bold_labels() %>%
+  italicize_levels() %>%
+  as_flex_table() 
 
 yhat <- predict(lin.mod5.full, newdata = testing)
 y.test <- testing[, "relatDiff"]
@@ -768,8 +815,17 @@ kable(predict(ridge.mod5.full, type = 'coefficients', s = best.lam)[1:12,], col.
 ### Least Squares Model for Difference in Classification Skills Test Scores and Diagnostics
 ```{r}
 lin.mod6.full <- lm(clasfDiff ~ (site + sex + age + viewcat + setting + viewenc), data = training, y = TRUE)
-summary(lin.mod6.full)
+#summary(lin.mod6.full)
 #AIC(lin.mod6.full)
+
+tbl_regression(lin.mod6.full, 
+               pvalue_fun = ~style_pvalue(.x, digits = 3),
+               label = list(site ~ "Site", sex ~ "Sex", age ~ "Age", viewenc~ "Encouraged to Watch", setting ~ "Where Sesame Street is Viewed", viewcat ~ "Frequency of Watching"),
+               intercept=T,  estimate_fun = function(x) style_sigfig(x, digits = 3)) %>%
+  bold_p(t = 0.05) %>%
+  bold_labels() %>%
+  italicize_levels() %>%
+  as_flex_table() 
 
 yhat <- predict(lin.mod6.full, newdata = testing)
 y.test <- testing[, "clasfDiff"]
