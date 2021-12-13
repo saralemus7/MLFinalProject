@@ -81,7 +81,7 @@ Our main focus will be on the new variables we created (`bodyDiff, letDiff, form
 
 We decided to plot the distribution of post-test - pre-test scores for each test using boxplots. First, we created separate plots for different values of the variable ``site``, as we conjectured that a child's background would have an effect on his or her change in test scores. From these plots, it appears that children from some backgrounds show greater changes in test scores than others, but this change was something we knew that we could examine further in our models. 
 
-## Plotting Differences in Unstandardized Scores across Students' Backgrounds
+## Plotting Differences in Unstandardized Scores By Students' Backgrounds
 
 ```{r moreEDA}
 boxbody <- ggplot(sesame, aes(x = bodyDiff, y = site)) + 
@@ -130,9 +130,9 @@ boxclasf <- ggplot(sesame, aes(x = clasfDiff, y = site)) +
 
 ```
 
-We also created separate plots for different values of the variable ``viewcat`` because we also assumed that the frequency at which children watch Sesame Street would affect their respective changes in test scores. One key takeaway from these plots is that for each test, the median value of post-test score - pre-test score is greater for children who watch Sesame Street very frequently (greater than 5 times a week) than for children who rarely watch Sesame Street. This trend suggests that Sesame Street has a positive educational impact on children by helping them improve their test scores. Again, however, this takeaway is something that we knew that we could examine further with our models. 
+We also created separate plots for different values of the variable ``viewcat`` because we also assumed that the frequency at which children watch Sesame Street would affect their respective changes in test scores. One key takeaway from these plots is that accross all tests, the median value of post-test score - pre-test score is greater for children who watch Sesame Street very frequently (greater than 5 times a week) than for children who rarely watch Sesame Street. This trend suggests that Sesame Street has a positive educational impact on children by helping them improve their test scores. Again, however, this takeaway is something that we knew that we could examine further with our models. 
 
-## Plotting Differences in Unstandardized Scores across Viewership Frequency 
+## Plotting Differences in Unstandardized Scores By Viewership Frequency 
 
 ```{r eval = FALSE}
 
@@ -214,7 +214,7 @@ For our first research question, we seek to predict the difference in pre and po
 Before including these covariates in any model, we first encoded all of them as type categorical which is appropriate given that each number represents a level rather than a numerical value.
  
 
-```{r eval = FALSE}
+```{r}
 ggplot(sesame, aes(x = numbDiff, y = as.factor(viewcat))) + 
   geom_boxplot(fill = "lightpink") +
   labs(title = "NumbDiff by ViewCat", x = "Post - Pre on Numbers") 
@@ -334,7 +334,7 @@ $$ 4.77 \ (\text{ViewCat = 5 Times a Week or More on Avg}) $$
 $$ \textbf{Forms Pre Score - Post Score} = 16.04 \ + \ 2.48 \ (\text{ViewCat = 5 Times a Week or More on Avg})$$
 $$ \textbf{Numbers Pre Score - Post Score} = 15.39 \ + \ 2.56 \ (\text{site = 2}) \ + \ 3.20 \ (\text{ViewCat = 3 to 5 Times Per Week}) + $$
 $$ 3.64 \ (\text{ViewCat = 5 Times a Week or More on Avg})$$
-$$ \textbf{Relational Terms Pre Score - Post Score} = 18.49 \ + \ 2.42 \ (\text{site = 4}) \ + \ 2.96 \ (\text{ViewCat = 5 Times a Week or More on Avg}) $$
+$$ \textbf{Relational Terms Pre Score - Post Score} = 18.49 \ + \ 2.42 \ (\text{site = 4}) \ + \ 2.96 \ +$$ $$(\text{ViewCat = 5 Times a Week or More on Avg}) $$
 $$ \textbf{Classification Skills Pre Score - Post Score} = 10.95 \ + \ 4.06 \ (\text{ViewCat = 5 Times a Week or More on Avg}) $$
 
 ### Interpretations  
