@@ -139,22 +139,22 @@ Before including these covariates in any model, we first encoded all of them as 
 
 ```{r eval = FALSE}
 ggplot(sesame, aes(x = numbDiff, y = as.factor(viewcat))) + 
-  geom_boxplot(fill = "lightblue") +
+  geom_boxplot(fill = "lightpink") +
   labs(title = "NumbDiff by ViewCat", x = "Post - Pre on Numbers") 
 ggplot(sesame, aes(x = letDiff, y = as.factor(viewcat))) + 
-  geom_boxplot(fill = "lightblue") +
+  geom_boxplot(fill = "lightpink") +
   labs(title = "LetDiff by ViewCat", x = "Post - Pre on Numbers") 
 ggplot(sesame, aes(x = bodyDiff, y = as.factor(viewcat))) + 
-  geom_boxplot(fill = "lightblue") +
+  geom_boxplot(fill = "lightpink") +
   labs(title = "BodyDiff by ViewCat", x = "Post - Pre on Numbers") 
 ggplot(sesame, aes(x = relatDiff, y = as.factor(viewcat))) + 
-  geom_boxplot(fill = "lightblue") +
+  geom_boxplot(fill = "lightpink") +
   labs(title = "RelatDiff by ViewCat", x = "Post - Pre on Numbers") 
 ggplot(sesame, aes(x = clasfDiff, y = as.factor(viewcat))) + 
-  geom_boxplot(fill = "lightblue") +
+  geom_boxplot(fill = "lightpink") +
   labs(title = "ClasfDiff by ViewCat", x = "Post - Pre on Numbers") 
 ggplot(sesame, aes(x = letDiff, y = as.factor(viewcat))) + 
-  geom_boxplot(fill = "lightblue") +
+  geom_boxplot(fill = "lightpink") +
   labs(title = "LetDiff by ViewCat", x = "Post - Pre on Numbers") 
 ```
 
@@ -188,8 +188,10 @@ After identifying the response variables and covariates, we must choose an appro
 #### Least-squares Regression
 We first decide to consider least-squares regression models as a potential model due to the fact that they provide apt inference into the relationship between the covariates and the response variable. Our regression models follow the general form:
 
-$$ Pretest-Posttest = \beta_0 \ + \ \beta_1 \ (\text{site = 2})+ \ \beta_2\ (\text{site = 3})+ \ \beta_3 \ (\text{site = 4})+ \ \beta_5 \ (\text{site = 5}) + \ \beta_6 \ (\text{sex =female}) \\ + \ \beta_7 \ (age) \ 
-+ \ \beta_8 \ (\text{ViewCat = Once or Twice per Week})+ \ \beta_9\ (\text{ViewCat = Three to Five Times per Week})+ \\ \beta_{10} \ (\text{ViewCat = 5 Times a Week or More on Avg})
+$$ Pretest-Posttest = \beta_0 \ + \ \beta_1 \ (\text{site = 2})+ \ \beta_2\ (\text{site = 3})+ \ \beta_3 \ (\text{site = 4})+ \ \beta_5 \ (\text{site = 5}) + \ \beta_6 \ (\text{sex =female}) \\$$ 
+$$+ \ \beta_7 \ (age) \ 
++ \ \beta_8 \ (\text{ViewCat = Once or Twice per Week})+ \ \beta_9\ (\text{ViewCat = Three to Five Times per Week})+ \\$$
+$$\beta_{10} \ (\text{ViewCat = 5 Times a Week or More on Avg})
 +  \ \beta_{11} \ (\text{Setting = School}) +  \ \beta_{12} \ (\text{ViewEnc = Not Encouraged})$$
 
 We perform this regression for all 6 different test types. 
@@ -247,7 +249,7 @@ We tested our model using linear, radial, sigmoid, and polynomial kernels and co
 
 ## Research Question 1
 
-As mentioned in methodlogy, we choose to model the relationship between the difference in test scores and our selected covariate using least squares regression. The below models are abbreviated and only include coefficients that were statistically significant at the $\alpha = 0.05$ level. Full model output can be found in the Appendix.
+As mentioned in methodology, we choose to model the relationship between the difference in test scores and our selected covariates using least squares regression. The below models are abbreviated and only include coefficients that were statistically significant at the $\alpha = 0.05$ level. Full model output can be found in the Appendix.
 
 $$ bodyDiff = 16.43 \ + \ 2.45 \ (site3) \ + \ 2.97 \ (site4) \ + \ 3.30 \ (site5) $$
 $$ letDiff = 10.52 \ + \ 3.09 \ (site2) \ - \ 2.86 \ (site3) \ + 4.85 \ (viewcat3) \ + 4.77 \ (viewcat4) $$
@@ -273,8 +275,6 @@ Looking at the least-squares  models, we can note a few important features regar
 For differences in letter recognition scores, we note the intercept is 10.52, the baseline difference. Again, holding all else constant, we see for 4 year old advantaged child from the suburbs (``site2``) this difference increases by 3.09. However, interestingly enough for an advantaged rural child (``site3``), the difference in test scores decreases by 2.86. It also seems that the frequency of watching Sesame Street has an effect on letter scores with `viewcat3` or watching 3-5 times a week increasing the difference by 4.85 and watching more than 5 times a week increasing the difference by 4.77. 
 
 For recognizing forms, the intercept is 16.04 and it seems that watching Sesame Street more than 5 times a week (``viewcat4``) , further increases this difference by 2.48. For numbers, the intercept is 15.39. We note that  for an 4 year old advantaged child from the suburbs, the difference in number scores increases by 2.56. Watching Sesame Street 3-5 times a week (``viewcat3``) increases the difference by 3.20, and watching more than 5 times a week increases the difference by 3.64.  For difference in relational term scores, the intercept is 18.49, the largest of all intercepts and the difference is further increased for a disadvantaged Spanish speaking child by 2.42. For those who watch more than 5 times a week, the difference increases by 2.96. For classification score differences, the intercept is 10.95. The only variable that increases this difference is the frequency of viewing, with those that watch Sesame Street more than 5 times a week increasing the difference by 4.06.
-
-In summary, we note that the variables that affect the difference in post and pre-test scores from these least squares regression models are mainly site ( which reflects the demographic/background of teh child) and `viewcat` (frequency of viewing Sesame Street). It makes sense that kids who watched more Sesame Street, especially those that watched more than 1-2 times a week, had larger differences between their pre and post-test scores. We also see that in general, the difference between pre and post scores are higher especially for body parts, relational terms, and forms as their intercept values were the highest.
 
 
 ## Research Question 2
@@ -359,21 +359,16 @@ kable_styling(table.svm.cm, bootstrap_options = "striped", full_width = F, latex
 
 ## Research Question 1
 
-The recurring motif from the linear regression models and regression trees is that the frequency at which a child watches Sesame Street (``viewcat``) and a child's background (``site``) are the most important variables in predicting the difference in test scores for a child. In 5 of the 6 linear regression models, at least one level of ``viewcat`` is a significant predictor for the response variable. Additionally, ``viewcat`` is included in every pruned regression tree. ``site`` is a significant predictor in 4 of the 6 linear regression models and is also included in 4 out of the 6 pruned regression trees. 
+The recurring motifs from our least squares regression models is that the frequency at which a child watches Sesame Street (``viewcat``) and a child's background (``site``) are the most important variables in predicting the difference in test scores for a child. In 5 of the 6 least squares regression models, at least one level of ``viewcat`` is a significant predictor for the response variable. This speaks to two important insights. First, the importance of `viewcat` suggests that children who watch Sesame Street more frequently are more likely to see greater differences in test scores compared to children who rarely watch Sesame Street. More specifically, the greatest increase in differences are seen in children who watch Sesame Street at least 3-5 times per week or more than 5 times a week. This relationship suggests that Sesame Street does have an impact on children's learning of fundamental subject matter and that the show at least to some extent accomplishes its goals of affecting learning outcomes. The second important insight from our findings is that 
 
-All the linear regression models indicate that children who watch Sesame Street more often are more likely to see greater improvements in test scores compared to children who rarely watch Sesame Street. More specifically, the greatest improvement is seen in children who watch Sesame Street at least 3-5 times per week. The regression tree generally corroborates the positive relationship between Sesame Street viewership frequency and test performance, but adds a few conditions. 
-
-For instance, the regression tree that predicts the difference in the numbers testing score (Tree 4) indicates that the improvement in score is greater for students who watch Sesame Street frequently than for children who watch less frequently, $\it{depending}$ on the child’s background. The tree predicts a higher score increase for children who either rarely watch Sesame Street or only do so once/twice a week who fall into one of these categories:
-(1) 4 year old advantaged child from the suburbs (2) disadvantaged Spanish speaking child. More succinctly, the tree predicts higher scores increases for certain children who watch Sesame Street less than others. 
-
-A similar scenario can be found in Tree 3 as well. In this instance, the tree predicts a higher score increase for children who rarely watch Sesame Street but are also less than 46 months (3.875 years) old than for children who watch Sesame Street at least 1-2 times per week. 
-
-Given that the test scores were scaled to the interval [0, 30], the intercept values for each of the linear regression models indicate that children, regardless of how often they watch Sesame Street, will see notable increases in test scores over the course of a year. This fact is not surprising, as the children in this study range from 3-5 years old, and children usually learn and develop intellectually very rapidly when they are in that age range. Nonetheless, the addition of frequent and regular Sesame Street viewership seems to further boost this developmental process and does so in a plethora of subject areas. 
+Given that the test scores were scaled to the interval [0, 30], the intercept values for each of the least squares regression models indicate that children, regardless of how often they watch Sesame Street, will see notable increases in test scores over the course of a year. This fact is not surprising, as the children in this study range from 3-5 years old, and children usually learn and develop intellectually very rapidly when they are in that age range. Nonetheless, the addition of frequent and regular Sesame Street viewership seems to further boost this developmental process and does so in a plethora of subject areas. 
 
 ## Research Question 2
-Our goal for this research question was to build a model that could accurately predict the background that a child came from based on their age, sex, and pretest scores. While our model does not perform very poorly on our data, there is still room for improvement. As mentioned in the Results section, the accuracy is .403, and this is among the highest accuracies values of all the models we tried. This could be a flaw of the data as we have only 240 observations which is not very many. Additionally, there is some imbalance in our data set as we have less observations of children from sites 4 and 5, disadvantaged rural children and disadvantaged Spanish speaking children respectively. This may be a flaw of the data collection, and our data may not be representative of the general population. Additionally, there may have existed a clustering structure that caused the SVM model to struggle with separating the different levels of site. This phenomenon may be illustrated with the confusion matrix having some difficulty separating between certain classes. When the true site is 3, indicating an advantaged child from the inner city, the model tends to predict site 4 as well which represents an advantaged rural child. The differences between these backgrounds may be quite small, so the model does not distinguish them quite well. We may be able to improve our model and gain greater predictive accuracy with more children in our data set and more data. Including more variables into our data set, such as child attendance in preschool or daycare, may also be useful for prediction and answering this research question. 
+Our goal for this research question was to build a model that could accurately predict the background that a child came from based on their age, sex, and pretest scores. While our model does not perform very poorly on our data, there is still room for improvement. As mentioned in the Results section, the accuracy is .403, and this is among the highest accuracy value of all the models we tried. This could be a flaw of the data as we have only 240 observations which is not very many. Additionally, there is some imbalance in our data set as we have less observations of children from sites 4 and 5, disadvantaged rural children and disadvantaged Spanish speaking children respectively. This may be a flaw of the data collection, and our data may not be representative of the general population. Additionally, there may have existed a clustering structure that caused the SVM model to struggle with separating the different levels of site. This phenomenon may be illustrated with the confusion matrix having some difficulty separating between certain classes. When the true site is 3, indicating an advantaged child from a rural area, the model tends to predict site 4 as well which represents an disadvantaged rural child. The differences between children from these backgrounds may be quite small, so the model does not distinguish them quite well. [] We may be able to improve our model and gain greater predictive accuracy with more children in our data set and more data. Including more variables into our data set, such as child attendance in preschool or daycare, may also be useful for prediction and answering this research question. 
 
-Another possible inference from these results is that pretest scores may not be predictive of background. Thus, whether a child is considered advantaged/disadvantaged or rural/suburban may not influence their pretest scores greatly. There also may be more factors that explain pretest scores. For example, socioeconomic status or parent education, may be a more useful response variable than a arbitrary determination of advantaged or disadvantaged. Future work may be focused on collecting information on these socioeconomic variables and performing analysis once again to see if our results differ. Additionally, there are also other optimization methods that we haven't explored. For example, one can try other feature transformation to make the data more separbale or try to design a customized SVM kernel that is better tailored to the distribution of data for this dataset.
+Another possible inference from these results is that pretest scores may not be predictive of background. Thus, whether a child is considered advantaged/disadvantaged or rural/suburban may not influence their pretest scores greatly. There also may be more factors that explain pretest scores. For example, socioeconomic status or parent education may be a more useful response variable than a arbitrary determination of advantaged or disadvantaged. Future work may be focused on collecting information on these socioeconomic variables and performing analysis once again to see if our results differ. Additionally, there are also other optimization methods that we haven't explored. For example, one can try other feature transformations to make the data more separable or try to design a customized SVM kernel that is better tailored to the distribution of data for this dataset.
+
+
 \newpage
 
 # Appendix
