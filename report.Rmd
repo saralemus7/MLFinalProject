@@ -55,7 +55,7 @@ sesame.sd <- sesame%>%
 
 # Introduction
 
-Sesame Street is a hallmark feature of American television that has been educating young children since 1969. The publicly-funded show was created with the goal of supplementing the learning of low-income preschoolers who did not have the access to early education that their other peers did. However, Sesame Street has had far-reaching success across all segments of the American population, regardless of background. In fact, according to one 1996 survey,  95% of all American children had watched Sesame Street by the time they turned 3. A more recent 2018 estimate suggested that about 86 million Americans had watched the show as young children. Such an impactful TV series that has influenced the childhoods of countless Americans warrants further investigation into the educational impacts of the progam itself. 
+Sesame Street is a hallmark feature of American television that has been educating young children since 1969. The publicly-funded show was created with the goal of supplementing the learning of low-income preschoolers who did not have the access to early education that their other peers did. However, Sesame Street has had far-reaching success across all segments of the American population, regardless of background. In fact, according to one 1996 survey,  95% of all American children had watched Sesame Street by the time they turned 3. A more recent 2018 estimate suggested that about 86 million Americans had watched the show as young children [1]. Such an influential TV series that has affected the childhoods of countless Americans warrants further investigation into the educational impacts of the program itself. 
 
 This project in particular makes use of a dataset that was compiled by researchers in the early 1970s meant to assess whether or not Sesame Street was achieving its goals of educating economically disadvantaged children. The researchers tested a variety of children from different backgrounds on critical skills like numbers and letters. They then re-tested these children after they had watched Sesame Street. Through our research, we seek to answer two questions related to this dataset about childhood education:
 
@@ -64,18 +64,65 @@ This project in particular makes use of a dataset that was compiled by researche
 
 The first question directly examines the relationship between Sesame Street and the knowledge of children who watch the program. Through this research goal, we hope to further understand the educational impact of the show on children of all backgrounds.
 
-The second question investigates the relationship between various subject pre-test scores and children of different income and living situations. By understanding this, we can develop a more more nuanced understanding of how low income children may be affected by their background. The lack of education for low-income students in America has been a problem for decades, and still persists today. One statistics suggests that a mere 18% of low-income students are enrolled in high-quality pre-K. Location also plays a role: 55% of children who live in rural areas lack access to high-quality education as well. The lack of access to pre-K disproportionately affects students from disadvantaged backgrounds, as they are left less ready for kindergarten and may suffer further disadvantages from their peers as they continue their education into elementary, middle, and high school. Thus, it is critical to further understand the relationship between the background of children and how this affects their ability to learn critical subjects like learning and math. 
+The second question investigates the relationship between various subject pre-test scores and children of different income and living situations. By understanding this, we can develop a more more nuanced understanding of how low income children may be affected by their background. The absence of early education for low-income students in America has been a problem for decades, and still persists today. One statistic suggests that a mere 18% of low-income students are enrolled in high-quality pre-K. Location also plays a role: 55% of children who live in rural areas lack access to high-quality education [2]. This lack of access to pre-K disproportionately affects students from disadvantaged backgrounds, as they are left less ready for kindergarten and may suffer further setbacks compared to their peers as they continue their education into elementary, middle, and high school. Thus, it is critical to further understand the relationship between the background of children and how this may affect their ability to test well on critical subjects like learning and math. 
 
 We address our research questions using various machine modeling techniques. More specifically, we will use ____ an SVM to classify the background that the child is from.
 
 
 # Data
 
-Our data contains 34 variables. The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The viewcat column is the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The setting is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The viewenc column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). Encour is the same variable but with values 0 and 1, respectively. Regular is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). 
+The data was collected in the early 1970s by researchers from Educational Testing Service, and the actual dataset itself was retrieved from a Columbia University database found [here](http://www.stat.columbia.edu/~gelman/arm/examples/sesame/). Our data contains 34 variables. The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The `viewcat` variable represents  the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The setting is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The `viewenc` column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). `Encour` is the same variable but with values 0 and 1, respectively. `Regular` is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). 
 
-The prebody, prelet, preform, prenumb, prerelat, and preclasf columns all decribe pretest scores on varying types of assessments (body parts, letters, forms, numbers, relational terms, and classification skills, respectively). The columns labeled postbody, postlet, postform, postnumb, postrelat, and postclasf are the children's respective posttest scores. We created the following variables - bodydiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff - to represent the difference in posttest scores and pretest scores for each child. Lastly, peabody represents a score of "mental age" for vocabulary maturity from the Peabody Picture Vocabulary Test.
+The `prebody, prelet, preform, prenumb, prerelat,` and `preclasf` columns all decribe pretest scores on varying types of assessments (body parts, letters, forms, numbers, relational terms, and classification skills, respectively). The columns labeled `postbody, postlet, postform, postnumb, postrelat,` and `postclasf` are the children's respective post-test scores. We created the following variables - `bodydiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff` - to represent the difference in post-test scores and pretest scores for each child. Lastly, `peabody` represents a score of "mental age" for vocabulary maturity from the Peabody Picture Vocabulary Test.
 
-Our main focus will be on the new variables we created (bodyDiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff) and variables related to how often the children watch Sesame Street (namely, viewcat and regular). Lastly, we will look into the backgrounds of the children, including site, sex, and age.
+Our main focus will be on the new variables we created (`bodyDiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff`) and variables related to how often the children watch Sesame Street (`namely, viewcat and regular`). Lastly, we will look into the backgrounds of the children, including `site, sex,` and `age`.
+
+```{r moreEDA}
+boxbody <- ggplot(sesame, aes(x = bodyDiff, y = site)) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "BodyDiff by Site", x = "Post - Pre on Body Parts") +
+  scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxlet <- ggplot(sesame, aes(x = letDiff, y = site)) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "LetDiff by Site", x = "Post - Pre on Letters") +
+  scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxform <- ggplot(sesame, aes(x = formDiff, y = site)) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "FormDiff by Site", x = "Post - Pre on Forms") +
+  scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxnumb <- ggplot(sesame, aes(x = numbDiff, y = site)) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "NumbDiff by Site", x = "Post - Pre on Numbers") +
+  scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxrelat <- ggplot(sesame, aes(x = relatDiff, y = site)) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "RelatDiff by Site", x = "Post - Pre on Relational") +
+  scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxclasf <- ggplot(sesame, aes(x = clasfDiff, y = site)) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "ClasfDiff by Site", x = "Post - Pre on Classification") +
+  scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+(boxbody + boxlet + boxform) / (boxnumb + boxrelat + boxclasf)
+
+```
 
 ```{r}
 bodyDiffplot <- ggplot(sesame, aes(x = bodyDiff)) + 
@@ -113,7 +160,7 @@ ageplot <- ggplot(sesame, aes(x = age)) +
 
 ```
 
-For the purposes of our analysis, we first examined the distributions of all variables. Shown above are our plots of a few important variables, including bodyDiff, numbDiff, Viewcat, Site, and Age. All of these variables appear to be relatively normal and unimodal, raising no concerns for neccessary transformations.
+For the purposes of our analysis, we first examined the distributions of all variables. Shown above are our plots of a few important variables, including `bodyDiff, numbDiff, Viewcat, Site,` and `Age`. All of these variables appear to be relatively normal and unimodal, raising no concerns for necessary transformations.
 
 
 # Methodology 
@@ -156,12 +203,13 @@ In addition to linear regression models, we also decided to use regression tree 
 The process of building the trees was very simple. After initially building the tree, we then performed cross validation to determine if pruning the tree would improve the deviance (the sum of the squared errors) for the tree. Using the cross validation plot that was then created, we choose the number of nodes for the tree that minimized the deviance. 
 
 ## Research Question 2
+
 In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question and it has a few different
 kernels that can place complex decision boundaries. We also implemented a classification tree and a logistic model to answer this question as well (See Appendix for more details). The three models have relatively similar performance in terms of overall prediction accuracy. However, we decided to present the SVM model as our final model since we have spent a considerable amount of time researching different optimization methods to boost its performance. Our full model formula is:
 $$SVM(site \mathtt{\sim} female + male + age + bodyparts_{pretest}+ letters_{pretest} + $$
 $$forms_{pretest} +numbers_{pretest} + relationalterms_{pretest} + classificationskills_{pretest} )$$
 
-We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. Since we are interested in high predictive power, we implemented a variety of different methods to improve our SVM models' performance. Standardizing the predictor variables in SVM and encoding categorical variables has been shown to improve performance for SVMs [1]. Thus, we used the standardized forms of the continuous variables in our model and encoded the female and male variables. We did indeed observe a small improvement in prediction accuracy across all models. However, one problem that particularly piqued our interests is that we are making no predictions for classes 4 or 5 for site. This could be due to sites 4 & 5 having a smaller number of observations than the other classes. We first tried using the Synthetic Minority Over-Sampling Technique (SMOTE) to increase observations within these classes; however, this technique had negligible effects on our accuracy. We then tried weighting the classes and used the formula below to assign weights to each class and specify "one versus one" comparison, which has been suggested to yield better prediction than "one versus all" [2].
+We split our data into a 70% training set and 30% testing set and analyzed the performance of our model on the test set. Since we are interested in high predictive power, we implemented a variety of different methods to improve our SVM models' performance. Standardizing the predictor variables in SVM and encoding categorical variables has been shown to improve performance for SVMs [3]. Thus, we used the standardized forms of the continuous variables in our model and encoded the female and male variables. We did indeed observe a small improvement in prediction accuracy across all models. However, one problem that particularly piqued our interests is that we are making no predictions for classes 4 or 5 for site. This could be due to sites 4 & 5 having a smaller number of observations than the other classes. We first tried using the Synthetic Minority Over-Sampling Technique (SMOTE) to increase observations within these classes; however, this technique had negligible effects on our accuracy. We then tried weighting the classes and used the formula below to assign weights to each class and specify "one versus one" comparison, which has been suggested to yield better prediction than "one versus all" [4].
 
 $$
 w_j =\frac{n}{kn_j} , \text{ n is total number of data points, k is number of classes, }n_j \text{ is the number of data in class j}
@@ -197,13 +245,13 @@ kable_styling(table, bootstrap_options = "striped", full_width = F, latex_option
 
 Linear Regression Models
 
-Looking at the least-squares linear models, we can note a few important features regarding predicting whether a child’s test scores will increase. For ``bodydiff``, or the difference between post and pre-tests scores for the recognition of body parts, we see that the intercept is 16.43, meaning that the post test results are higher. However, as noted by the other predictors, this difference between post and pre gets larger as the site increases holding all else constant. We see if a child is ``site3``, or an advantaged rural child, the difference between their scores goes up by 2.45 . For a disadvantaged rural child, the difference increases even more by 2.97 and for a disadvantaged Spanish speaking child, the difference goes up by 3.30. This indicates that for children from more disadvantaged backgrounds, the difference between the scores increases as compared to the two other sites.
+Looking at the least-squares linear models, we can note a few important features regarding predicting whether a child’s test scores will increase. For ``bodydiff``, or the difference between post and pre-tests scores for the recognition of body parts, we see that the intercept is 16.43, meaning that the post-test results are higher. However, as noted by the other predictors, this difference between post and pre gets larger as the site increases holding all else constant. We see if a child is ``site3``, or an advantaged rural child, the difference between their scores goes up by 2.45 . For a disadvantaged rural child, the difference increases even more by 2.97 and for a disadvantaged Spanish speaking child, the difference goes up by 3.30. This indicates that for children from more disadvantaged backgrounds, the difference between the scores increases as compared to the two other sites.
 
 For differences in letter recognition scores, we note the intercept is 10.52, the baseline difference. Again, holding all else constant, we see for 4 year old advantaged children from the suburbs (``site2``) this difference increases by 3.09. However, interestingly enough for an advantaged rural child (``site3``), the difference in test scores decreases by 2.86. It also seems that the frequency of watching Sesame Street has an effect on letter scores with viewcat3 or watching 3-5 times a week increasing the difference by 4.85 and watching more than 5 times a week increasing the difference by 4.77. 
 
 For recognizing forms, the intercept is 16.04 and it seems that watching Sesame Street more than 5 times a week (``viewcat4``) , further increases this difference by 2.48. For numbers, the intercept is 15.39. We note that  for an 4 year old advantaged child from the suburbs, the difference in number scores increases by 2.56. Watching Sesame Street 3-5 times a week (``viewcat3``) increases the difference by 3.20, and watching more than 5 times a week increases the difference by 3.64.  For difference in relational term scores, the intercept is 18.49, the largest of all intercepts and the difference is further increased for a disadvantaged Spanish speaking child by 2.42. For those who watch more than 5 times a week, the difference increases by 2.96. For classification score differences, the intercept is 10.95. The only variable that increases this difference is the frequency of viewing, with those that watch Sesame Street more than 5 times a week increasing the difference by 4.06.
 
-In summary, we note that the variables that affect the difference in post and pre test scores from these linear regression models are mainly from site (demographic/background) and viewcat (frequency of viewing). It makes sense that kids who watched more Sesame street, especially those that watched more than 1-2 times a week had larger differences between their pre and post test scores.We also see that in general, the post scores are higher than the pre test scores especially for body parts, relational terms, and forms as their intercept values were the highest.
+In summary, we note that the variables that affect the difference in post and pre test scores from these linear regression models are mainly from site (demographic/background) and viewcat (frequency of viewing). It makes sense that kids who watched more Sesame street, especially those that watched more than 1-2 times a week had larger differences between their pre and post-test scores.We also see that in general, the post scores are higher than the pre test scores especially for body parts, relational terms, and forms as their intercept values were the highest.
 
 
 
@@ -385,9 +433,13 @@ Another possible inference from these results is that pretest scores may not be 
 # Appendix
 
 ## References
-[1] A Practical Guide to Support Vector Machines. (2003). National Taiwan University. https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
+[1] Sesame Street. (2021). Wikipedia. https://en.wikipedia.org/wiki/Sesame_Street
 
-[2] One-vs-Rest and One-vs-One for Multi-Class Classification. (2020). Machine Learning Mastery. https://machinelearningmastery.com/one-vs-rest-and-one-vs-one-for-multi-class-classification/
+[2] The Need. (2021). First Five Years Fund. https://www.ffyf.org/why-it-matters/the-need/
+
+[3] A Practical Guide to Support Vector Machines. (2003). National Taiwan University. https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
+
+[4] One-vs-Rest and One-vs-One for Multi-Class Classification. (2020). Machine Learning Mastery. https://machinelearningmastery.com/one-vs-rest-and-one-vs-one-for-multi-class-classification/
 
 ## Research Question 1: Linear Models
 ```{r factor-categoricals}
