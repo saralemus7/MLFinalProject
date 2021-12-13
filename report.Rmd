@@ -128,7 +128,7 @@ We first decided to use least-squares regression models due to the fact that the
 
 We tuned our $\lambda$ parameter using 10-fold cross validation. More specifically, we computed the cross-validation error rate for our model for a grid of $\lambda$ values. Thereafter, we selected the $\lambda$ value for which the cross-validation error is the smallest. 
 
-Initially, we were inclined to use least absolute shrinkage and selection operator (LASSO) regression. The main advantage of LASSO regression over ridge regression is that LASSO regression performs variable selection by setting the slope coefficients of inert predictors to 0. The reason why we initially thought that LASSO regression would work better than ridge regression is that in most of our linear models, only a small subset of variables are significant at a 95% significance level.  However, our ridge regression models performed marginally better than our LASSO regression models, so for this reason, we decided to report the MSE’s for the ridge regression models. The ridge regression model outputs are:
+Initially, we were inclined to use least absolute shrinkage and selection operator (LASSO) regression. The main advantage of LASSO regression over ridge regression is that LASSO regression performs variable selection by setting the slope coefficients of inert predictors to 0. The reason why we initially thought that LASSO regression would work better than ridge regression is that in most of our linear models, only a small subset of variables are significant at a 95% significance level.  However, our ridge regression models performed marginally better than our LASSO regression models, so for this reason, we decided to report the MSE’s for the ridge regression models. The ridge regression models are:
 
 $$ bodyDiff = 16.01 \ + \ 0.94 \ (site3) \ + \ 0.95 \ (site4) \ + \ 1.34 \ (site5) $$
 $$ letDiff = 12.09 \ + \ 3.09 \ (site2) \ - \ 2.56 \ (site3) \ + 3.53 \ (viewcat3) \ + 3.47 \ (viewcat4) $$
@@ -137,7 +137,7 @@ $$ numbDiff = 18.98 \ + \ 0.99 \ (site2) \ + \ 0.49 \ (viewcat3) \ + \ 0.80 \ (v
 $$ relatDiff = 17.93 \ + \ 0.67 \ (site4) \ + \ 0.95 \ (viewcat4) $$
 $$ clasfDiff = 14.77 \ + \ 0.15 \ (viewcat4) $$
 
-The least-squares regression outputs are:
+The least-squares models are:
 
 $$ bodyDiff = 16.43 \ + \ 2.45 \ (site3) \ + \ 2.97 \ (site4) \ + \ 3.30 \ (site5) $$
 $$ letDiff = 10.52 \ + \ 3.09 \ (site2) \ - \ 2.86 \ (site3) \ + 4.85 \ (viewcat3) \ + 4.77 \ (viewcat4) $$
@@ -156,8 +156,7 @@ In addition to linear regression models, we also decided to use regression tree 
 The process of building the trees was very simple. After initially building the tree, we then performed cross validation to determine if pruning the tree would improve the deviance (the sum of the squared errors) for the tree. Using the cross validation plot that was then created, we choose the number of nodes for the tree that minimized the deviance. 
 
 ## Research Question 2
-In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question and it has a few different
-kernels that can place complex decision boundaries. We also implemented a classification tree and a logistic model to answer this question as well (See Appendix for more details). The three models have relatively similar performance in terms of overall prediction accuracy. However, we decided to present the SVM model as our final model since we have spent a considerable amount of time researching different optimization methods to boost its performance. Our full model formula is:
+In order to address our second research question, predicting whether a child came from an disadvantaged background or not based on their pretest scores and demographic information, we utilized a support vector machine (SVM). There is often an association between poorer educational access and outcomes for disadvantaged, rural children; thus, we want to see if this association is strong enough that we can predict the socioeconomic background of a child based on their test scores. Our model uses the sex, age, and all pretest score variables to predict our response variable, site. Since our response variable is a categorical variable, a SVM is a valid choice to answer our research question and it has a few different kernels that can place complex decision boundaries. We also implemented a classification tree and a logistic model to answer this question as well (See Appendix for more details). The three models have relatively similar performance in terms of overall prediction accuracy. However, we decided to present the SVM model as our final model since we have spent a considerable amount of time researching different optimization methods to boost its performance. Our full model formula is:
 $$SVM(site \mathtt{\sim} female + male + age + bodyparts_{pretest}+ letters_{pretest} + $$
 $$forms_{pretest} +numbers_{pretest} + relationalterms_{pretest} + classificationskills_{pretest} )$$
 
