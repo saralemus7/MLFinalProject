@@ -71,61 +71,138 @@ We address our research questions using various machine modeling techniques. Mor
 
 # Data
 
-The data was collected in the early 1970s by researchers from Educational Testing Service, and the actual dataset itself was retrieved from a Columbia University database [3]. Our data contains 34 variables. The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The `viewcat` variable represents  the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The setting is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The `viewenc` column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). `Encour` is the same variable but with values 0 and 1, respectively. `Regular` is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). 
+The data was collected in the early 1970s by researchers from Educational Testing Service, and the actual dataset itself was retrieved from a Columbia University database [3]. The researchers sampled children representative of 5 economically advantaged and disadvantaged populations in the US. The children were randomly assigned to either receive encouragement to watch Sesame Street or not to receive encouragement. The children in the encouragement group were given promotional materials about Sesame Street, and the ETS staff called and visited every week to ensure children were actively watching Sesame Street. Those who were not in this group did not receive any of this. Children were intially tested in 1970, and the post test evaluations were one year later.
+
+Our data contains 34 variables. The ID refers to a subject's identification number. The site refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The `viewcat` variable represents  the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The setting is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The `viewenc` column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). `Encour` is the same variable but with values 0 and 1, respectively. `Regular` is an indicator variable representing if a child is a regular viewer (0 = rarely watched, 1 = watched once per week or greater). We decided that it was not feasible to use data from multiple sources due to the fact that there is not any further information available about the participants in the study (other than the dataset from the Columbia University database).
 
 The `prebody, prelet, preform, prenumb, prerelat,` and `preclasf` columns all describe pretest scores on varying types of assessments (body parts, letters, forms, numbers, relational terms, and classification skills, respectively). The columns labeled `postbody, postlet, postform, postnumb, postrelat,` and `postclasf` are the children's respective post-test scores. We created the following variables - `bodydiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff` - to represent the difference in post-test scores and pretest scores for each child. Lastly, `peabody` represents a score of "mental age" for vocabulary maturity from the Peabody Picture Vocabulary Test.
 
 Our main focus will be on the new variables we created (`bodyDiff, letDiff, formDiff, numbDiff, relatDiff, clasfDiff`) and variables related to how often the children watch Sesame Street (`namely, viewcat and regular`). Lastly, we will look into the backgrounds of the children, including `site, sex,` and `age`.
 
+We decided to plot the distribution of post-test - pre-test scores for each test using boxplots. First, we created separate plots for different values of the variable ``site``, as we conjectured that a child's background would have an effect on his or her change in test scores. From these plots, it appears that children from some backgrounds show greater changes in test scores than others, but this change was something we knew that we could examine further in our models. 
+
+## Plotting Differences in Unstandardized Scores across Students' Backgrounds
+
 ```{r moreEDA}
 boxbody <- ggplot(sesame, aes(x = bodyDiff, y = site)) + 
   geom_boxplot(fill = "lightblue") +
-  labs(title = "BodyDiff by Site", x = "Post - Pre on Body Parts") +
+  labs(title = "Body Parts", x = "Post - Pre") +
   scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
   theme_minimal() +
   theme(axis.title.y = element_blank())
 
 boxlet <- ggplot(sesame, aes(x = letDiff, y = site)) + 
   geom_boxplot(fill = "lightblue") +
-  labs(title = "LetDiff by Site", x = "Post - Pre on Letters") +
+  labs(title = "Letters", x = "Post - Pre") +
   scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
   theme_minimal() +
   theme(axis.title.y = element_blank())
 
 boxform <- ggplot(sesame, aes(x = formDiff, y = site)) + 
   geom_boxplot(fill = "lightblue") +
-  labs(title = "FormDiff by Site", x = "Post - Pre on Forms") +
-  scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
+  labs(title = "Forms", x = "Post - Pre") +
+  scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad+ rural", "disad Spanish")) +
   theme_minimal() +
   theme(axis.title.y = element_blank())
 
 boxnumb <- ggplot(sesame, aes(x = numbDiff, y = site)) + 
   geom_boxplot(fill = "lightblue") +
-  labs(title = "NumbDiff by Site", x = "Post - Pre on Numbers") +
+  labs(title = "Numbers", x = "Post - Pre") +
   scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
   theme_minimal() +
   theme(axis.title.y = element_blank())
 
 boxrelat <- ggplot(sesame, aes(x = relatDiff, y = site)) + 
   geom_boxplot(fill = "lightblue") +
-  labs(title = "RelatDiff by Site", x = "Post - Pre on Relational") +
+  labs(title = "Relational Terms", x = "Post - Pre") +
   scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
   theme_minimal() +
   theme(axis.title.y = element_blank())
 
 boxclasf <- ggplot(sesame, aes(x = clasfDiff, y = site)) + 
   geom_boxplot(fill = "lightblue") +
-  labs(title = "ClasfDiff by Site", x = "Post - Pre on Classification") +
+  labs(title = "Classification Skills", x = "Post - Pre") +
   scale_y_discrete(labels=c("disad city", "adv suburb", "adv rural", "disad rural", "disad Spanish")) +
   theme_minimal() +
   theme(axis.title.y = element_blank())
 
-(boxbody + boxlet + boxform) / (boxnumb + boxrelat + boxclasf)
+(boxbody + boxclasf + boxform) / (boxnumb + boxrelat + boxlet)
 
 ```
 
+We also created separate plots for different values of the variable ``viewcat`` because we also assumed that the frequency at which children watch Sesame Street would affect their respective changes in test scores. One key takeaway from these plots is that for each test, the median value of post-test score - pre-test score is greater for children who watch Sesame Street very frequently (greater than 5 times a week) than for children who rarely watch Sesame Street. This trend suggests that Sesame Street has a positive educational impact on children by helping them improve their test scores. Again, however, this takeaway is something that we knew that we could examine further with our models. 
 
-For the purposes of our analysis, we first examined the distributions of all variables. Shown above are our plots of a few important variables, including `bodyDiff, numbDiff, Viewcat, Site,` and `Age`. All of these variables appear to be relatively normal and unimodal, raising no concerns for necessary transformations.
+## Plotting Differences in Unstandardized Scores across Viewership Frequency 
+
+```{r eval = FALSE}
+
+boxbody <- ggplot(sesame, aes(x = bodyDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightpink") + 
+  labs(title = "Body Parts", x = "Post - Pre") +
+  scale_y_discrete(labels=c("rarely", "1-2 times a week", "3-5 times a week", ">5 times a week")) +   
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxlet <- ggplot(sesame, aes(x = letDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightpink") +
+  labs(title = "Letters", x = "Post - Pre") +
+  scale_y_discrete(labels=c("rarely", "1-2 times a week", "3-5 times a week", ">5 times a week")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxform <- ggplot(sesame, aes(x = formDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightpink") +
+  labs(title = "Forms", x = "Post - Pre") +
+  scale_y_discrete(labels=c("rarely", "1-2 times a week", "3-5 times a week", ">5 times a week")) + 
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxnumb <- ggplot(sesame, aes(x = numbDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightpink") +
+  labs(title = "Numbers", x = "Post - Pre") +
+  scale_y_discrete(labels=c("rarely", "1-2 times a week", "3-5 times a week", ">5 times a week")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxrelat <- ggplot(sesame, aes(x = relatDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightpink") +
+  labs(title = "Relational Terms", x = "Post - Pre") +
+  scale_y_discrete(labels=c("rarely", "1-2 times a week", "3-5 times a week", ">5 times a week")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+boxclasf <- ggplot(sesame, aes(x = clasfDiff, y = as.factor(viewcat))) + 
+  geom_boxplot(fill = "lightpink") +
+  labs(title = "Classification Skills", x = "Post - Pre") +
+  scale_y_discrete(labels=c("rarely", "1-2 times a week", "3-5 times a week", ">5 times a week")) +
+  theme_minimal() +
+  theme(axis.title.y = element_blank())
+
+(boxbody + boxclasf + boxform) / (boxnumb + boxrelat + boxlet)
+
+```
+
+```{r eval = FALSE}
+ggplot(sesame, aes(x = numbDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "NumbDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = letDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "LetDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = bodyDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "BodyDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = relatDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "RelatDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = clasfDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "ClasfDiff by Viewenc", x = "Post - Pre on Numbers") 
+ggplot(sesame, aes(x = letDiff, y = as.factor(viewenc))) + 
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "LetDiff by Viewenc", x = "Post - Pre on Numbers") 
+```
+
 
 
 # Methodology 
@@ -359,10 +436,12 @@ One of the main limitations to our conclusions from our least squares models has
 
 
 ## Research Question 2
-Our goal for this research question was to build a model that could accurately predict the background that a child came from based on their age, sex, and pretest scores. While our model does not perform very poorly on our data, there is still room for improvement. As mentioned in the Results section, the accuracy is .403, and this is among the highest accuracy value of all the models we tried. This could be a flaw of the data as we have only 240 observations which is not very many. Additionally, there is some imbalance in our data set as we have less observations of children from sites 4 and 5, disadvantaged rural children and disadvantaged Spanish speaking children respectively. This may be a flaw of the data collection, and our data may not be representative of the general population. Additionally, there may have existed a clustering structure that caused the SVM model to struggle with separating the different levels of site. This phenomenon may be illustrated with the confusion matrix having some difficulty separating between certain classes. When the true site is 3, indicating an advantaged child from a rural area, the model tends to predict site 4 as well which represents an disadvantaged rural child. The differences between children from these backgrounds may be quite small, so the model does not distinguish them quite well. [] We may be able to improve our model and gain greater predictive accuracy with more children in our data set and more data. Including more variables into our data set, such as child attendance in preschool or daycare, may also be useful for prediction and answering this research question. 
+Our goal for this research question was to build a model that could accurately predict the background that a child came from based on their age, sex, and pretest scores. Even though our model is not extremely accurate, we are still able to predict with 40% accuracy which background a child comes from using their pre-test scores and age and sex. This indicates that there is a fairly strong connection between a family's income level and living area and the performance of their children on critical subjects like letters and numbers. While our model does not perform very poorly on our data, there is still room for improvement. Of all the models we tried, the best accuracies were all right around 40%. This could be a flaw of the data as we have only 240 observations which is not very many. Additionally, there is some imbalance in our data set as we have less observations of children from sites 4 and 5, disadvantaged rural children and disadvantaged Spanish speaking children respectively. This may be a flaw of the data collection, and our data may not be representative of the general population. Additionally, there may have existed a clustering structure that caused the SVM model to struggle with separating the different levels of site. This phenomenon may be illustrated with the confusion matrix having some difficulty separating between certain classes. When the true site is 3, indicating an advantaged child from a rural area, the model tends to predict site 4 as well which represents an disadvantaged rural child. The differences between children from these backgrounds may be quite small, so the model does not distinguish them quite well. This may be due to the fact that children living in rural areas have less access to education in general as mentioned in the Introduction. Therefore, socioeconomic differences between children living in these areas may not matter as much since high quality education is difficult to access for both high and low income families. We may be able to improve our model and gain greater predictive accuracy with more children in our data set and more data. Including more variables into our data set, such as child attendance in preschool or daycare, may also be useful for prediction and answering this research question. 
 
-Another possible inference from these results is that pretest scores may not be predictive of background. Thus, whether a child is considered advantaged/disadvantaged or rural/suburban may not influence their pretest scores greatly. There also may be more factors that explain pretest scores. For example, socioeconomic status or parent education may be a more useful response variable than a arbitrary determination of advantaged or disadvantaged. Future work may be focused on collecting information on these socioeconomic variables and performing analysis once again to see if our results differ. Additionally, there are also other optimization methods that we haven't explored. For example, one can try other feature transformations to make the data more separable or try to design a customized SVM kernel that is better tailored to the distribution of data for this dataset.
+Another possible inference from these results is that there may be more factors that explain pretest scores. For example, parent income level or highest degree of parent education may be a more useful response variable than a arbitrary determination of advantaged or disadvantaged. We do not have information on what the researchers determined to be advantaged or disadvantaged, so their definitions of these categories may be different than our opinions or those of the general public. Our data was also collected in the 70s which is a vastly different time period than the one we are currently in, so categories of advantaged and disadvantaged may be different now compared to back then. A more concrete response variable like the ones previously mentioned might provide more information. Future work may be focused on collecting information on these socioeconomic variables and performing analysis once again to see if our results differ. Additionally, there are also other optimization methods that we haven't explored. For example, one can try other feature transformations to make the data more separable or try to design a customized SVM kernel that is better tailored to the distribution of data for this dataset.
 
+## General Takeaways
+For both research questions, we found that the site variable, which represents the socioeconomic background of a child, plays an important role on pre-test scores as well as the difference between pre- and post-test scores. This finding is consistent with our original beliefs as there is a well-known connection between worse educational opportunities and educational performance for low income and rural children. Our research supports this conclusion, indicating that more work is necessary to ensure that children of disadvantaged, low-income, and rural communities are able to access high-quality and affordable education from a young age to ensure proper learning of essential topics such as letters and numbers and ensure future academic success. 
 
 \newpage
 
