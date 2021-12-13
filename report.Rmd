@@ -214,10 +214,10 @@ We also noticed that each of the the tests are scored on different scales. For e
 
 ```{r}
 df1 <- data.frame(Response = c("Body Parts Diff", "Letters Diff", "Forms Diff", "Numbers Diff", "Relational Terms Diff", "Classification Skills Diff"), 
-Least.Squares.Regression.Test.MSE = c(24.01, 14.31, 13.26, 15.51, 18.94, 48.40), Ridge.Regression.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
+Least.Squares.Test.MSE = c(24.01, 14.31, 13.26, 15.51, 18.94, 48.40), Ridge.Test.MSE = c(21.61, 14.20, 12.83, 14.63, 19.86, 44.26), Regression.Tree.Test.MSE = c(20.60, 15.41, 14.92, 15.91, 19.89, 45.53))
 
 table <- kable(df1, caption = "Test MSE's for 3 Candidate Models", booktabs=T)
-kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+kable_styling(table, bootstrap_options = "striped", full_width = T, latex_options = "HOLD_position")
 ```
 
 The above table compares the predictive performance of all model types. We see that all 3 candidate models have fairly comparable performance on our test data set, with ridge regression seeming to have the lowest MSE for 4 out of the 6 tests. Least squares regression is the second best for predictive performance, scoring the lowest MSE for the relational terms test difference and having  similar MSEs as ridge regression for most tests. Regression trees subsequently perform the worst.
@@ -247,25 +247,7 @@ We tested our model using linear, radial, sigmoid, and polynomial kernels and co
 
 ## Research Question 1
 
-```{r}
-
-df2 <- data.frame(Response = c("bodyDiff", "letDiff", "formDiff", "numbDiff", "relatDiff", "clasfDiff"), 
-R.Squared = c(0.159, 0.37, 0.063, 0.139, 0.107, 0.094))
-
-table <- kable(df2, caption = "Multiple R-Squared Values for Least-Squares Regression Models", booktabs=T)
-kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
-```
-
- The ridge regression models are:
-
-$$ bodyDiff = 16.01 \ + \ 0.94 \ (site3) \ + \ 0.95 \ (site4) \ + \ 1.34 \ (site5) $$
-$$ letDiff = 12.09 \ + \ 3.09 \ (site2) \ - \ 2.56 \ (site3) \ + 3.53 \ (viewcat3) \ + 3.47 \ (viewcat4) $$
-$$ formDiff = 15.52 \ + \ 0.14 \ (viewcat4)$$
-$$ numbDiff = 18.98 \ + \ 0.99 \ (site2) \ + \ 0.49 \ (viewcat3) \ + \ 0.80 \ (viewcat4)$$
-$$ relatDiff = 17.93 \ + \ 0.67 \ (site4) \ + \ 0.95 \ (viewcat4) $$
-$$ clasfDiff = 14.77 \ + \ 0.15 \ (viewcat4) $$
-
-The least-squares models are:
+As mentioned in methodlogy, we choose to model the relationship between the difference in test scores and our selected covariate using least squares regression. The below models are abbreviated and only include coefficients that were statistically significant at the $\alpha = 0.05$ level. Full model output can be found in the Appendix.
 
 $$ bodyDiff = 16.43 \ + \ 2.45 \ (site3) \ + \ 2.97 \ (site4) \ + \ 3.30 \ (site5) $$
 $$ letDiff = 10.52 \ + \ 3.09 \ (site2) \ - \ 2.86 \ (site3) \ + 4.85 \ (viewcat3) \ + 4.77 \ (viewcat4) $$
@@ -274,95 +256,25 @@ $$ numbDiff = 15.39 \ + \ 2.56 \ (site2) \ + \ 3.20 \ (viewcat3) \ + \ 3.64 \ (v
 $$ relatDiff = 18.49 \ + \ 2.42 \ (site4) \ + \ 2.96 \ (viewcat4) $$
 $$ clasfDiff = 10.95 \ + \ 4.06 \ (viewcat4) $$
 
+We also display the R squared values for each test.
+
+```{r}
+df2 <- data.frame(Response = c("Body Parts Diff", "Letters Diff", "Forms Diff", "Numbers Diff", "Relational Terms Diff", "Classification Skills Diff"), 
+R.Squared = c(0.159, 0.37, 0.063, 0.139, 0.107, 0.094))
+
+table <- kable(df2, caption = "Multiple R-Squared Values for Least-Squares Regression Models", booktabs=T)
+kable_styling(table, bootstrap_options = "striped", full_width = F, latex_options = "HOLD_position")
+```
 
 ### Interpretations  
 
-Linear Regression Models
+Looking at the least-squares  models, we can note a few important features regarding predicting whether a child’s test scores will increase. For ``bodydiff``, or the difference between post and pre-tests scores for the recognition of body parts, we see that the intercept is 16.43. This large positive intercept may be explained by the fact that all 6 tests have more positive values for difference than negative values (meaning that more children had higher post test scores compared to their pre test scores). We also see that for all the levels of site that were statistically significant, our model estimated a positive coefficient value. Specifically, we see that if a child is ``site3``, or an advantaged rural child, the difference between their scores goes up by 2.45 . For a disadvantaged rural child, the difference increases even more by 2.97 and for a disadvantaged Spanish speaking child, the difference goes up by 3.30. This indicates that for children from more disadvantaged backgrounds, the difference between the scores increases as compared to the two other sites.
 
-Looking at the least-squares linear models, we can note a few important features regarding predicting whether a child’s test scores will increase. For ``bodydiff``, or the difference between post and pre-tests scores for the recognition of body parts, we see that the intercept is 16.43, meaning that the post-test results are higher. However, as noted by the other predictors, this difference between post and pre gets larger as the site increases holding all else constant. We see if a child is ``site3``, or an advantaged rural child, the difference between their scores goes up by 2.45 . For a disadvantaged rural child, the difference increases even more by 2.97 and for a disadvantaged Spanish speaking child, the difference goes up by 3.30. This indicates that for children from more disadvantaged backgrounds, the difference between the scores increases as compared to the two other sites.
-
-For differences in letter recognition scores, we note the intercept is 10.52, the baseline difference. Again, holding all else constant, we see for 4 year old advantaged children from the suburbs (``site2``) this difference increases by 3.09. However, interestingly enough for an advantaged rural child (``site3``), the difference in test scores decreases by 2.86. It also seems that the frequency of watching Sesame Street has an effect on letter scores with viewcat3 or watching 3-5 times a week increasing the difference by 4.85 and watching more than 5 times a week increasing the difference by 4.77. 
+For differences in letter recognition scores, we note the intercept is 10.52, the baseline difference. Again, holding all else constant, we see for 4 year old advantaged child from the suburbs (``site2``) this difference increases by 3.09. However, interestingly enough for an advantaged rural child (``site3``), the difference in test scores decreases by 2.86. It also seems that the frequency of watching Sesame Street has an effect on letter scores with `viewcat3` or watching 3-5 times a week increasing the difference by 4.85 and watching more than 5 times a week increasing the difference by 4.77. 
 
 For recognizing forms, the intercept is 16.04 and it seems that watching Sesame Street more than 5 times a week (``viewcat4``) , further increases this difference by 2.48. For numbers, the intercept is 15.39. We note that  for an 4 year old advantaged child from the suburbs, the difference in number scores increases by 2.56. Watching Sesame Street 3-5 times a week (``viewcat3``) increases the difference by 3.20, and watching more than 5 times a week increases the difference by 3.64.  For difference in relational term scores, the intercept is 18.49, the largest of all intercepts and the difference is further increased for a disadvantaged Spanish speaking child by 2.42. For those who watch more than 5 times a week, the difference increases by 2.96. For classification score differences, the intercept is 10.95. The only variable that increases this difference is the frequency of viewing, with those that watch Sesame Street more than 5 times a week increasing the difference by 4.06.
 
-In summary, we note that the variables that affect the difference in post and pre test scores from these linear regression models are mainly from site (demographic/background) and viewcat (frequency of viewing). It makes sense that kids who watched more Sesame street, especially those that watched more than 1-2 times a week had larger differences between their pre and post-test scores.We also see that in general, the post scores are higher than the pre test scores especially for body parts, relational terms, and forms as their intercept values were the highest.
-
-
-
-Regression Tree 1  
-For differences in body part recognition scores:
-
-  
-* We see that if a child is in site 1 and 2 (3-5 year old disadvantage child from the inner city, 4-year-old advantage child from the suburbs respectively)
-    - They are younger than 46.5 months or 3.87 years old
-        - They watch sesame street either once/twice per week or 3-5 times per week
-            - The predicted difference is 11.95
-        - They watch sesame street either rarely, or more than 5 times per week
-            - The predicted difference is 17.65
-    -  They are older than or equal to 3.87 years old/46.5 months
-        - The predicted difference is 11.37
-* If the child is in site 3, 4, 5 (an advantaged rural child, a disadvantaged rural child,  disadvantaged Spanish speaking child)
-    - The predicted difference is 14.30
-
-
-Regression Tree 2  
-For differences in letter recognition scores:  
-
-* If the child is in site 1, 3, 4, 5 (3-5 year old disadvantaged child from the inner city,  an advantaged rural child, a disadvantaged rural child, a disadvantaged Spanish speaking child respectively)
-    - They view Sesame Street either rarely or once/twice per week
-        - The predicted difference is 12.37
-    - They view Sesame Street either 3-5 times a week or more than 5 times a week
-        - The predicted difference is 16.56
-* If the child is in site 2 (4 year old advantaged child from the suburbs)
-    - The predicted difference is  20.24
-
-Regression Tree 3  
-For differences in form recognition scores:  
-
-* If the child rarely watches Sesame Street (``viewcat1``)
-    - They are less than 46.5 months (~3.875 years old)
-        - The predicted difference is 17.96
-    - They are older than or equal to 46.5 months (~3.875 years old)
-        - The predicted difference is  12.94
-* The child watches either once/twice per week, or  3-5 times a week, or more than 5 times per week
-    - The predicted differences is 15.72
-
-Regression Tree 4  
-For differences in numbers testing scores:  
-
-* If the child watches Sesame Street 3-5 times a week or more (``viewcat`` values of 3 and 4)
-    - The predicted difference is 20.83
-* If the child watches Sesame Street rarely or once/twice per week (``viewcat`` values of 1 and 2)
-    - If the child is a 4-year-old advantaged child from the suburbs or a disadvantaged Spanish speaking child
-        - The predicted difference is 21.29
-    - If the child is a 3-5 year old disadvantaged child from the inner city, an advantaged rural child, or a disadvantaged rural child
-        - The predicted difference is 17.51
-
-Regression Tree 5  
-For differences in relational terms scores:  
-
-* If the child is less than 38-months-old (3.16-years-old):
-    - The predicted difference is 20.22
-* If the child is greater than 38-months-old (3.16-years-old):  
-    - If the child is a 3-5 year old disadvantaged child from the inner city, a 4 year old advantaged child from the suburbs, or a disadvantaged Spanish speaking child:
-        - The predicted difference is 14.60
-    - If the child is an advantaged or disadvantaged rural child:
-        - If the child watches Sesame Street rarely, once/twice per week, or 3-5 times per week:  
-            - If the child watches Sesame Street at home the predicted difference is 17.12
-            - If the child watches Sesame Street at school the predicted difference is 13.59
-        - If the child watches Sesame Street more than 5 times per week:
-            - The predicted difference is 19.30
-
-Regression Tree 6  
-For differences in classification skills scores:  
-
-* If the child rarely watches Sesame Street (``viewcat`` values of 1):
-    - The predicted difference is 12.16
-* If the child watches Sesame Street once/twice a week or more (``viewcat`` values of 2-4):
-    - The predicted difference is 15.54
-
-Overall, this tree demonstrates that children who watch Sesame Street more frequently show a greater improvement in classification skills testing than children who rarely watch Sesame Street.
-
+In summary, we note that the variables that affect the difference in post and pre-test scores from these least squares regression models are mainly site ( which reflects the demographic/background of teh child) and `viewcat` (frequency of viewing Sesame Street). It makes sense that kids who watched more Sesame Street, especially those that watched more than 1-2 times a week, had larger differences between their pre and post-test scores. We also see that in general, the difference between pre and post scores are higher especially for body parts, relational terms, and forms as their intercept values were the highest.
 
 
 ## Research Question 2
