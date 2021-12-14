@@ -69,12 +69,12 @@ There are a variety of situational and demographic factors that were collected b
 
 The second question investigates the relationship between various subject pre-test scores and children of different income and living situations. By understanding this, we can develop a more more nuanced understanding of how low income children may be affected by their background. The absence of early education for low-income students in America has been a problem for decades, and still persists today. One statistic suggests that a mere 18% of low-income students are enrolled in high-quality pre-K. Location also plays a role: 55% of children who live in rural areas lack access to high-quality education [2]. This lack of access to pre-K disproportionately affects students from disadvantaged backgrounds, as they are left less ready for kindergarten and may suffer further setbacks compared to their peers as they continue their education into elementary, middle, and high school. Thus, it is critical to further understand the relationship between the background of children and how this may affect their ability to test well on critical subjects like learning and math. 
 
-We address our research questions using various machine modeling techniques. More specifically, for our first research question we will perform a comparison of least squares, ridge, and tree regression models to find the model that is most interpretable and accurate, which after performing our analysis ends up being least sqaures regression. For our second question, we will fit a multi-class SVM classifier to predict what background a child comes from.
+We address our research questions using various machine modeling techniques. More specifically, for our first research question we will perform a comparison of least squares, ridge, and tree regression models to find the model that is most interpretable and accurate, which after performing our analysis ends up being least squares regression. For our second question, we will fit a multi-class SVM classifier to predict what background a child comes from.
 
 
 # Data
 
-The data was collected in the early 1970s by researchers from the Educational Testing Service (ETS), and the actual dataset itself was retrieved from a Columbia University database [3]. The researchers sampled children representative of 5 economically advantaged and disadvantaged populations in the US. The children were randomly assigned to either receive encouragement to watch Sesame Street or not to receive encouragement. The children in the encouragement group were given promotional materials about Sesame Street, and the ETS staff called and visited every week to ensure children were actively watching Sesame Street. Those who were not in the encouragement group did not receive any of this. The children were intially tested in 1970 on skills relating to body parts, letters, forms, numbers, relational terms, and classfication skills, and the post test evaluations were one year later after watching the show. While we considered using other data sources, we decided that it was not feasible due to the fact that there is not any further information available about the participants in the study and their backgrounds (other than the dataset from the Columbia University database).
+The data was collected in the early 1970s by researchers from the Educational Testing Service (ETS), and the actual dataset itself was retrieved from a Columbia University database [3]. The researchers sampled children representative of 5 economically advantaged and disadvantaged populations in the US. The children were randomly assigned to either receive encouragement to watch Sesame Street or not to receive encouragement. The children in the encouragement group were given promotional materials about Sesame Street, and the ETS staff called and visited every week to ensure children were actively watching Sesame Street. Those who were not in the encouragement group did not receive any of this. The children were initially tested in 1970 on skills relating to body parts, letters, forms, numbers, relational terms, and classification skills, and the post test evaluations were one year later after watching the show. While we considered using other data sources, we decided that it was not feasible due to the fact that there is not any further information available about the participants in the study and their backgrounds (other than the dataset from the Columbia University database).
 
 Our data contains 34 variables. The ID refers to a subject's identification number. `site` refers to the age and background information of the child. A site value of 1 indicates a 3-5 year old disadvantaged child from the inner city. A site value of 2 represents a 4 year old advantaged child from the suburbs. A value of 3 represents an advantaged rural child. A site value of 4 indicates a disadvantaged rural child. Lastly, a value of 5 represents a disadvantaged Spanish speaking child. For the sex, a value of 1 indicates male, and a value of 2 indicates female. The age category is the child's age in months. The `viewcat` variable represents  the frequency of viewing Sesame Street (1 = rarely, 2 = once/twice per week, 3 = 3-5 times a week, 4 = more than 5 times per week). The `setting` is where Sesame Street was viewed; a value of 1 indicates home and a value of 2 indicates school. The `viewenc` column refers to if the child was encouraged to watch or not (1 = child not encouraged, 2 = child encouraged). 
 
@@ -133,7 +133,7 @@ boxclasf <- ggplot(sesame, aes(x = clasfDiff, y = site)) +
 
 We decided to plot the distribution of post-test - pre-test scores for each test using boxplots. First, we created separate plots for different values of the variable ``site``, as we conjectured that a child's background would have an effect on his or her change in test scores. From these plots, it appears that children from some backgrounds show greater changes in test scores than others, and we will further examine this relationship in our models. 
 
-We also created separate plots for different values of the variable ``viewcat`` because we also assumed that the frequency at which children watch Sesame Street would affect their respective changes in test scores. One key takeaway from these plots is that accross all tests, the median value of post-test score - pre-test score is greater for children who watch Sesame Street very frequently (greater than 5 times a week) than for children who rarely watch Sesame Street. This trend suggests that Sesame Street has a positive educational impact on children by helping them improve their test scores. Again, however, this takeaway is something that we will examine further with our models. 
+We also created separate plots for different values of the variable ``viewcat`` because we also assumed that the frequency at which children watch Sesame Street would affect their respective changes in test scores. One key takeaway from these plots is that across all tests, the median value of post-test score - pre-test score is greater for children who watch Sesame Street very frequently (greater than 5 times a week) than for children who rarely watch Sesame Street. This trend suggests that Sesame Street has a positive educational impact on children by helping them improve their test scores. Again, however, this takeaway is something that we will examine further with our models. 
 
 ## Plotting Differences in Unstandardized Scores By Viewership Frequency 
 
@@ -429,7 +429,7 @@ kable_styling(table.svm.cm, bootstrap_options = "striped", full_width = F, latex
 
 The findings from our least squares regression models is that the frequency at which a child watches Sesame Street (``viewcat``) and a child's background (``site``) are the most important variables in predicting the difference in test scores for a child. In 5 of the 6 least squares regression models, at least one level of ``viewcat`` is a significant predictor for the response variable. We also saw that at least one level of site was significant in 4 out of the 6 models that we found (body parts, letters, numbers, and relational). This speaks to two important insights. First, the importance of `viewcat` suggests that children who watch Sesame Street more frequently are more likely to see greater differences in test scores compared to children who rarely watch Sesame Street. More specifically, the greatest increase in differences are seen in children who watch Sesame Street at least 3-5 times per week or more than 5 times a week. This relationship suggests that Sesame Street does have an impact on children's learning of fundamental subject matters and that the show accomplishes its goals of affecting learning outcomes. The second important insight from our findings is that, at least to some extent, the background of a child is related to their difference between pre and post-test scores. This implies that the background of a child is important when thinking about how children learn and perform on these tests.
 
-We also cared about how well our model could accurately predict the difference in pre and post-test scores. Being able to predict these scores accurately is an indicator that we appropriately selected our covariates and were able to fit a model that alllows us to understand the relationship between these variables and the differences in test scores. When comparing performance across all 6 tests, we find that our models had the best predictive performance on the letters and forms tests, as these two had the lowest test MSEs. Our model had the worst performance on the classification skills test score difference, with an MSE value of 48. While we do feel like we satisfied our research goal of being able to build a predictive model, there is undoubtedly room for improvement when it comes to the predictive performance of our models, especially for the classification skills and body parts test. 
+We also cared about how well our model could accurately predict the difference in pre and post-test scores. Being able to predict these scores accurately is an indicator that we appropriately selected our covariates and were able to fit a model that allows us to understand the relationship between these variables and the differences in test scores. When comparing performance across all 6 tests, we find that our models had the best predictive performance on the letters and forms tests, as these two had the lowest test MSEs. Our model had the worst performance on the classification skills test score difference, with an MSE value of 48. While we do feel like we satisfied our research goal of being able to build a predictive model, there is undoubtedly room for improvement when it comes to the predictive performance of our models, especially for the classification skills and body parts test. 
 
 One of the main limitations to our conclusions from our least squares models has to do with the relationship between our data and time. While our model does find statistically significant associations between covariates like a child's background and how often the child watches Sesame Street, we suspect that time may be a variable that is affecting the difference in between post-test and pre-test scores. Children can learn and develop a lot in a year, especially at such a young age (all children were between 3 and 5 years old). Thus, it is possible that time is a latent variable explaining some of this difference in testing scores. This hypothesis is supported by the fact that all of our least squares models had R-squared values below 0.4, suggesting that our models do not explain a lot of the variation in our response and there may be additional data that is affecting our response that was not included in our model specification. 
 
@@ -555,7 +555,8 @@ ridge.mod1.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod1.full, s = best.lam, newx = x.test)
-kable(predict(ridge.mod1.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
+kable(predict(ridge.mod1.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3, "latex", booktabs = T) %>% 
+  kable_styling(position = "center")
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -679,7 +680,8 @@ ridge.mod3.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod3.full, s = best.lam, newx = x.test)
-kable(predict(ridge.mod3.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
+kable(predict(ridge.mod3.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3, "latex", booktabs = T) %>% 
+  kable_styling(position = "center")
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -742,7 +744,8 @@ ridge.mod4.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod4.full, s = best.lam, newx = x.test)
-kable(predict(ridge.mod4.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
+kable(predict(ridge.mod4.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3, "latex", booktabs = T) %>% 
+  kable_styling(position = "center")
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -805,7 +808,8 @@ ridge.mod5.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod5.full, s = best.lam, newx = x.test)
-kable(predict(ridge.mod5.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
+kable(predict(ridge.mod5.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3, "latex", booktabs = T) %>% 
+  kable_styling(position = "center")
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
@@ -867,7 +871,8 @@ ridge.mod6.full <- glmnet(x.train, y.train, alpha = 0, lambda = best.lam)
 
 # calculate predictions
 ridge.pred <- predict(ridge.mod6.full, s = best.lam, newx = x.test)
-kable(predict(ridge.mod6.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3)
+kable(predict(ridge.mod6.full, type = 'coefficients', s = best.lam)[1:12,], col.names = c("Estimate"), digits = 3, "latex", booktabs = T) %>% 
+  kable_styling(position = "center")
 
 # MSE calculation
 #mean((ridge.pred - y.test)^2)
